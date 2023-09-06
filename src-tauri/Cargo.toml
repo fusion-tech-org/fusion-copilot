@@ -1,0 +1,34 @@
+[package]
+name = "FusionTech"
+version = "0.0.0"
+description = "A Tauri App"
+authors = ["you"]
+license = ""
+repository = ""
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1.4", features = [] }
+
+[dependencies]
+tauri = { version = "1.4", features = [ "shell-open", "shell-execute", "path-all", "fs-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+zip = "0.6.6"
+anyhow = "1.0.75"
+mime = "0.3.17"
+tokio = "1.32.0"
+reqwest = "0.11.20"
+actix-web = "4.4.0"
+actix-files = "0.6.2"
+dirs = "5.0.1"
+diesel = { version = "2.1.1", features = ["sqlite"] }
+diesel_migrations = "2.1.0"
+thiserror = "1.0.48"
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

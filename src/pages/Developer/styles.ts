@@ -1,0 +1,59 @@
+import styled from 'styled-components';
+
+export const AppZipListWrapper = styled.div`
+  height: calc(100vh - 174px);
+  padding-right: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+
+  &:hover {
+    transition: display 0.3s;
+
+    &::-webkit-scrollbar {
+      display: block;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    display: none;
+
+    .adjust-scrollbar {
+      margin-right: -4px;
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    width: 4px;
+    border-radius: 2px;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 2px;
+    height: 48px;
+  }
+`;
+
+export const AppDetailContainer = styled.section`
+  height: 100vh;
+  padding: 16px;
+  overflow: hidden;
+`;
+
+export const AppDetailLog = styled.div`
+  margin-top: 24px;
+`;
+
+export const AppDetailLogWrapper = styled.div`
+  width: 100%;
+  height: 384px;
+  margin-top: 16px;
+  border: 1px solid #f5f5f5;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  overflow: auto;
+`;

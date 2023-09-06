@@ -1,0 +1,105 @@
+{
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "FusionTech",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "execute": true,
+        "sidecar": false,
+        "open": true,
+        "scope": [
+          {
+            "name": "run-start-app",
+            "cmd": "java",
+            "args": true
+          },
+          {
+            "name": "echo",
+            "cmd": "echo",
+            "args": true
+          },
+          {
+            "name": "run-sh-file",
+            "cmd": "sh",
+            "args": true
+          },
+          {
+            "name": "run-kill-app",
+            "cmd": "kill",
+            "args": true
+          },
+          {
+            "name": "run-static-server",
+            "cmd": "node",
+            "args": true
+          },
+          {
+            "name": "run-git-commit",
+            "cmd": "git",
+            "args": [
+              "commit",
+              "-m",
+              {
+                "validator": "\\S+"
+              }
+            ]
+          }
+        ]
+      },
+      "fs": {
+        "all": true,
+        "scope": [
+          "$DOWNLOAD",
+          "$DOWNLOAD/*",
+          "$APPLOCALDATA",
+          "$APPLOCALDATA/*",
+          "$APPLOCALDATA/fusion-tech",
+          "$APPDATA",
+          "$HOME",
+          "$RESOURCE/*",
+          "$RESOURCE/lang/*",
+          "$RESOURCE/scripts/*"
+        ]
+      },
+      "path": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "cn.fusiontech.www",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "resources": ["lang/*", "scripts/*"]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "width": 1024,
+        "height": 768,
+        "hiddenTitle": true
+      }
+    ]
+  }
+}

@@ -10,14 +10,14 @@ pub fn greet(name: &str) -> String {
   format!("Hi, {name}")
 }
 
-#[tauri::command]
-pub async fn getPackageListByFolder<R: Runtime>(
-  app: tauri::AppHandle<R>,
-  window: tauri::Window<R>,
-  folderName: &str,
-) -> Result<(), String> {
-  Ok(())
-}
+// #[tauri::command]
+// pub async fn getPackageListByFolder<R: Runtime>(
+//   app: tauri::AppHandle<R>,
+//   window: tauri::Window<R>,
+//   folderName: &str,
+// ) -> Result<(), String> {
+//   Ok(())
+// }
 
 #[tauri::command]
 pub fn unzip_file(source_file: &str, target_dir: &str) -> Result<bool, String> {

@@ -6,11 +6,16 @@ import { PageAppDetail } from 'pages/Developer/PageAppDetail';
 import { PageDevSetting } from 'pages/Developer/PageDevSetting';
 import { ToolKitPage } from 'pages/Toolkit';
 import { ImageHandler } from 'pages/Toolkit/ImageHandler';
+import { NotesPage } from 'pages/Notes';
 
 export const rootRouter = createBrowserRouter([
   {
     path: '/',
     element: <HomePage />,
+  },
+  {
+    path: '/notes',
+    element: <NotesPage />,
   },
   {
     path: '/developer',

@@ -6,7 +6,8 @@ diesel::table! {
         title -> Text,
         content -> Text,
         note_status -> Integer,
-        created_at -> Timestamp,
+        created_at -> Text,
+        updated_at -> Text,
     }
 }
 
@@ -16,8 +17,10 @@ diesel::table! {
         app_name -> Text,
         app_id -> Text,
         app_version -> Text,
+        local_path -> Text,
         unzipped -> Bool,
         is_running -> Bool,
+        created_at -> Text,
     }
 }
 

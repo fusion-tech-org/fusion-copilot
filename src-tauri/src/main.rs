@@ -2,8 +2,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use front_commands::action_opts::{
-  create_note, create_ziwei_app, del_app_by_id, get_app_by_id, query_ziwei_apps,
-  toggle_app_running_status,
+  create_ziwei_app, del_app_by_id, get_app_by_id, query_ziwei_apps, toggle_app_running_status,
 };
 use front_commands::file_opts::{get_resource_file, greet, unzip_file};
 use front_commands::sys_opts::{
@@ -45,7 +44,6 @@ fn main() {
       unzip_file,
       get_resource_file,
       create_ziwei_app,
-      create_note,
       run_local_server,
       get_available_port_list,
       check_port_is_available,

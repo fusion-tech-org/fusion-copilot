@@ -4,6 +4,8 @@ CREATE TABLE ziwei_apps (
   app_name VARCHAR NOT NULL,
   app_id VARCHAR NOT NULL,
   app_version VARCHAR NOT NULL,
+  local_path VARCHAR NOT NULL,
   unzipped BOOLEAN NOT NULL DEFAULT false,
-  is_running BOOLEAN NOT NULL DEFAULT false
+  is_running BOOLEAN NOT NULL DEFAULT false,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 )

@@ -17,7 +17,8 @@
     "paths": {
       "assets/*": ["./src/assets/*"],
       "pages/*": ["./src/pages/*"],
-      "components/*": ["./src/components/*"]
+      "components/*": ["./src/components/*"],
+      "constants/*": ["./src/constants/*"]
     },
 
     /* Linting */

@@ -4,5 +4,6 @@ CREATE TABLE notes (
   title VARCHAR NOT NULL,
   content TEXT NOT NULL,
   note_status INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_DATE
+  created_at VARCHAR NOT NULL,
+  updated_at VARCHAR NOT NULL
 )

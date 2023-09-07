@@ -6,6 +6,7 @@ import {
   readTextFile,
   removeDir,
   removeFile,
+  readBinaryFile,
 } from '@tauri-apps/api/fs';
 import {
   appLocalDataDir,
@@ -24,13 +25,15 @@ import {
   SettingOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { find, orderBy } from 'lodash';
+import { find, orderBy, remove } from 'lodash';
 import { MyLink } from 'components/index';
+import { LocalAppItem, RemoteAppItem } from './interface';
+import { DB_CUD_SUCCESS_FLAG } from 'constants/index';
 
 const VALID_PACKAGE_PREFIX = '紫薇';
 
 export interface PackageList {
-  id: string;
+  aid: string;
   name: string;
   path: string;
 }
@@ -39,7 +42,7 @@ type PositionType = 'left' | 'right';
 type TabsItems = 'deployment_manage' | 'tools_manage';
 
 export const DeveloperPage = () => {
-  const [packageList, setPackageList] = useState<PackageList[]>([]);
+  const [availableApps, setAvailableApps] = useState<RemoteAppItem[]>([]);
   const [activeTabItem, setActiveTabItem] =
     useState<TabsItems>('deployment_manage');
 
@@ -47,42 +50,44 @@ export const DeveloperPage = () => {
     setActiveTabItem(key as TabsItems);
   };
 
-  const queryAppPackages = async () => {
+  const queryLocalApps = async () => {
     const entries = await readDir('', {
       dir: BaseDirectory.Download,
       recursive: false,
     });
-    const validPackages = [];
-    const nameRE = new RegExp(
+    const validLocalApps = [];
+    const validAppFileRE = new RegExp(
       `^(${VALID_PACKAGE_PREFIX}).*(?<=_)([a-z0-9]{24})(?=_).*(\.zip)$`,
       'ig'
     );
-    const appIdRE = /.*(?<=_)([a-z0-9]{24})(?=_).*/i;
+    // const appIdRE = /.*(?<=_)([a-z0-9]{24})(?=_).*/i;
+    // const splitFileNameRE = new RegExp(
+    //   `^(${VALID_PACKAGE_PREFIX}).*(?<=_)([a-z0-9]{24})(?=_).*(\.zip)$`,
+    //   'ig'
+    // );
 
     for (const entry of entries) {
-      const packName = entry.name || '';
+      const entryName = entry.name || '';
 
-      if (nameRE.test(packName)) {
-        const matchRes = packName.match(appIdRE);
-        const curAppId = matchRes?.[1];
+      if (validAppFileRE.test(entryName)) {
+        const [appFileName, _] = entryName.split('.zip');
+        const [_prefix, appName, appId, appVersion] =
+          appFileName?.split('_') ?? [];
 
-        if (curAppId && !find(validPackages, { id: curAppId })) {
-          const packItem = {
-            id: curAppId,
-            name: packName,
-            path: entry.path,
-          };
+        const packItem = {
+          aid: appId,
+          name: appName,
+          localPath: entry.path,
+          version: appVersion,
+        };
 
-          validPackages.push(packItem);
-        }
+        validLocalApps.push(packItem);
       }
     }
 
-    const orderedPackaged = orderBy(validPackages, ['id'], ['asc']);
+    const orderedApps = orderBy(validLocalApps, ['aid'], ['asc']);
 
-    setPackageList(orderedPackaged);
-
-    return orderedPackaged;
+    return orderedApps;
   };
 
   const handleUnzipPackage = useCallback(async (sourceFile: string) => {
@@ -199,26 +204,35 @@ export const DeveloperPage = () => {
     console.log(res, 'res');
   };
 
-  const asyncToDB = async (apps: PackageList[]) => {
-    console.log(apps);
+  const saveAppToDB = async (newApp: LocalAppItem) => {
     try {
-      for (let i = 0; i < apps.length; i++) {
-        const cur = apps[i];
-        const { id, name } = cur;
-
-        await invoke('create_ziwei_app', {
-          name: name,
-          newAppId: id,
-          version: '1.0.0',
-        });
-      }
+      const { aid, version, name, localPath } = newApp;
+      await invoke('create_ziwei_app', {
+        name,
+        newAppId: aid,
+        version,
+        localAppPath: localPath,
+      });
     } catch (e) {
       console.log(e);
     }
   };
 
-  const handleReloadFiles = async () => {
-    await asyncToDB(packageList);
+  const removeAppById = async (appPrimaryKey: number) => {
+    try {
+      const delRes = await invoke('del_app_by_id', {
+        appKey: appPrimaryKey,
+      });
+
+      if (delRes === DB_CUD_SUCCESS_FLAG) {
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   };
 
   const handleDelAllApps = async () => {
@@ -226,9 +240,60 @@ export const DeveloperPage = () => {
 
     console.log('queryApps', queryApps);
   };
+  const queryRemoteApps = async () => {
+    try {
+      const queryApps = await invoke('query_ziwei_apps');
+
+      if (!(queryApps as RemoteAppItem[])?.length) {
+        return [];
+      }
+
+      return queryApps as RemoteAppItem[];
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  };
+
+  const compareLocalAppToRemote = async () => {
+    const localApps = await queryLocalApps();
+    const remoteApps = await queryRemoteApps();
+    const processedApps = remoteApps;
+
+    console.log(localApps, remoteApps);
+    /**
+     * NOTE: Base on local apps to create new app
+     */
+    for (let i = 0; i < localApps.length; i++) {
+      const curLocalApp = localApps[i];
+
+      if (find(remoteApps, ['app_id', curLocalApp.aid])) continue;
+
+      await saveAppToDB(curLocalApp);
+    }
+
+    /**
+     * NOTE: Base on local apps to delete are those removed local apps manually
+     */
+    for (let i = 0; i < remoteApps.length; i++) {
+      const curRemoteApp = remoteApps[i];
+      const curAppId = curRemoteApp.app_id;
+
+      if (find(localApps, ['aid', curAppId])) continue;
+
+      await removeAppById(curRemoteApp.id);
+
+      remove(processedApps, (app) => app.app_id === curAppId);
+    }
+
+    setAvailableApps(processedApps);
+  };
 
   useEffect(() => {
-    queryAppPackages();
+    /**
+     * NOTE: Comparing apps of local directory with sqlite's storing apps
+     */
+    compareLocalAppToRemote();
   }, []);
 
   const items: TabsProps['items'] = [
@@ -242,8 +307,7 @@ export const DeveloperPage = () => {
           onStop={handleStopApp}
           onUpdate={handleUpdateApp}
           onDelete={handleDelApp}
-          onDetail={handleQueryAppDetail}
-          packageList={packageList}
+          availableApps={availableApps}
         />
       ),
     },
@@ -260,7 +324,7 @@ export const DeveloperPage = () => {
       <div className="flex items-center">
         <div
           className="cursor-pointer hover:text-primary duration-300"
-          onClick={handleReloadFiles}
+          onClick={compareLocalAppToRemote}
         >
           <ReloadOutlined />
           <span className="pl-1.5">文件重载</span>
@@ -293,7 +357,7 @@ export const DeveloperPage = () => {
           <MyLink to="/developer/global-setting">
             <SettingOutlined />
             <span className="px-1">·</span>
-            <span>偏好设置</span>
+            <span>我的设置</span>
           </MyLink>
         </div>
       </div>

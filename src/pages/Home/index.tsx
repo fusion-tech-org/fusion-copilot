@@ -1,5 +1,5 @@
 import { Space, Card } from 'antd';
-import { BugOutlined, ToolOutlined } from '@ant-design/icons';
+import { BugOutlined, ReadOutlined, ToolOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 export const HomePage = () => {
@@ -35,6 +35,19 @@ export const HomePage = () => {
             onClick={handleLink('/toolkit')}
           >
             工具箱
+          </p>
+        </Card>
+        <Card style={{ width: 200 }}>
+          <ReadOutlined
+            style={{
+              fontSize: 32,
+            }}
+          />
+          <p
+            className="text-lg mt-2 cursor-pointer"
+            onClick={handleLink('/notes')}
+          >
+            备忘录
           </p>
         </Card>
       </Space>

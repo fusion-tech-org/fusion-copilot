@@ -25,6 +25,7 @@ export default defineConfig(async () => ({
       pages: `${srcDir}/pages`,
       components: `${srcDir}/components`,
       constants: `${srcDir}/constants`,
+      store: `${srcDir}/store`,
     },
   },
   // 3. to make use of `TAURI_DEBUG` and other env variables

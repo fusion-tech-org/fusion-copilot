@@ -2,7 +2,7 @@ use crate::local_db::establish_connection;
 use crate::local_db::models::{NewNote, NewZiWeiApp, ZiWeiApp};
 use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
 
-use FusionTech::schema::ziwei_apps::dsl::*;
+use fusion_copilot::schema::ziwei_apps::dsl::*;
 
 // create the error type that represents all errors possible in our program
 #[derive(Debug, thiserror::Error)]

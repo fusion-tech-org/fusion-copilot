@@ -18,7 +18,8 @@
       "assets/*": ["./src/assets/*"],
       "pages/*": ["./src/pages/*"],
       "components/*": ["./src/components/*"],
-      "constants/*": ["./src/constants/*"]
+      "constants/*": ["./src/constants/*"],
+      "store/*": ["./src/constants/*"]
     },
 
     /* Linting */

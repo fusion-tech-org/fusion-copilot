@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 use diesel::sql_types::Integer;
 use diesel::sqlite::Sqlite;
+use fusion_copilot::schema::{notes, ziwei_apps};
 use serde::{Deserialize, Serialize};
-use FusionTech::schema::{notes, ziwei_apps};
 
 #[derive(Insertable)]
 #[diesel(table_name = ziwei_apps)]

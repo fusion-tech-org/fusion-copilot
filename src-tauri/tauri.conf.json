@@ -74,6 +74,15 @@
       },
       "path": {
         "all": true
+      },
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": [
+          "http://localhost:4875/*",
+          "http://127.0.0.1:4875/*",
+          "http://0.0.0.0:4875/*"
+        ]
       }
     },
     "bundle": {

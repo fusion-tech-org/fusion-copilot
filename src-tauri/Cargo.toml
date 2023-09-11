@@ -1,23 +1,24 @@
 [package]
-name = "FusionTech"
-version = "0.0.0"
+name = "fusion_copilot"
+version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+authors = ["fujia"]
+license = "MIT"
+repository = "https://github.com/fusion-tech-org/fusion-copilot.git"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.4", features = [] }
+prost-build = "0.12" # compile protobuf
 
 [dependencies]
-tauri = { version = "1.4", features = [ "shell-open", "shell-execute", "path-all", "fs-all"] }
+tauri = { version = "1.4", features = [ "http-all", "shell-open", "shell-execute", "path-all", "fs-all"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 zip = "0.6.6"
-anyhow = "1.0.75"
+anyhow = "1.0.75" # error's handling
 mime = "0.3.17"
 tokio = "1.32.0"
 reqwest = "0.11.20"
@@ -26,7 +27,17 @@ actix-files = "0.6.2"
 dirs = "5.0.1"
 diesel = { version = "2.1.1", features = ["sqlite"] }
 diesel_migrations = "2.1.0"
-thiserror = "1.0.48"
+thiserror = "1.0.48" 
+base64 = "0.21.3" # base64 encode/decode
+bytes = "1.5.0" # handle byte stream
+image = "0.24.7" # handle picture
+lazy_static = "1.4.0" # To initiate static variable more convenient via macro
+lru = "0.11.1" # LRU cache
+percent-encoding = "2.3.0" # url encode/decode
+photon-rs = "0.3.2" # picture's effects
+prost = "0.12.0" # protobuf's handling
+tracing = "0.1.37" # logger and tracing
+tracing-subscriber = "0.3.17" # logger and tarcing
 
 
 [features]

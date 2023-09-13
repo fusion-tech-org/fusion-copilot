@@ -47,7 +47,7 @@ export const ImageHandler = () => {
       //   timeout: 30,
       // });
 
-      console.log(response);
+      console.log(typeof response.data);
     } catch (e) {}
   };
 

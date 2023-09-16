@@ -47,9 +47,9 @@ export const ToolKitPage = () => {
     },
 
     {
-      title: 'Ant Design Title 4',
-      description: '我的描述',
-      url: '/',
+      title: 'SQL查询器',
+      description: '本地SQL查询器',
+      url: '/toolkit/sql-querier',
     },
   ];
 

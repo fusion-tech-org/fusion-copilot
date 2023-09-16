@@ -98,6 +98,11 @@
       ],
       "resources": ["lang/*", "scripts/*"]
     },
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "menuOnLeftClick": true
+    },
     "security": {
       "csp": null
     },
@@ -107,7 +112,16 @@
         "resizable": true,
         "width": 1024,
         "height": 768,
-        "hiddenTitle": true
+        "hiddenTitle": true,
+        "visible": true
+      },
+      {
+        "width": 1024,
+        "height": 768,
+        "decorations": false,
+        "url": "splashscreen.html",
+        "label": "splashscreen",
+        "visible": false
       }
     ]
   }

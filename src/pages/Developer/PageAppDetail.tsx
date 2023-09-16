@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Badge, Descriptions, Space } from 'antd';
+import { Badge, Button, Descriptions, Space, message } from 'antd';
 import type { DescriptionsProps } from 'antd';
 import { LeftCircleOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api';
@@ -13,6 +13,12 @@ import {
 import { MyLink } from 'components/index';
 import { RemoteAppItem } from './interface';
 import { toNumber } from 'lodash';
+import {
+  appLocalDataDir,
+  resolve,
+  resolveResource,
+} from '@tauri-apps/api/path';
+import { Command } from '@tauri-apps/api/shell';
 
 const initDescItems: DescriptionsProps['items'] = [
   {
@@ -55,20 +61,175 @@ const initDescItems: DescriptionsProps['items'] = [
   },
 ];
 
-const initDescActionItems: DescriptionsProps['items'] = [
+type ActionValue = 'unzip' | 'startup' | 'stop' | 'update' | 'delete';
+
+type ActionStatus = 'default' | 'warn' | 'primary' | 'danger';
+
+const ActionList: Readonly<
+  Array<{
+    label: string;
+    value: ActionValue;
+    actionStatus?: ActionStatus;
+    id: number;
+  }>
+> = [
   {
-    key: 'action',
-    label: '操作',
-    children: (
-      <Space>
-        <div>解压</div>
-      </Space>
-    ),
+    id: 1,
+    label: '解压',
+    value: 'unzip',
+  },
+  {
+    id: 2,
+    label: '启动',
+    value: 'startup',
+  },
+  {
+    id: 3,
+    label: '停止',
+    value: 'stop',
+  },
+  {
+    id: 4,
+    label: '更新',
+    value: 'update',
+  },
+  {
+    id: 5,
+    label: '删除',
+    value: 'delete',
   },
 ];
 
 export const PageAppDetail = () => {
   const { id } = useParams();
+  const appDetailRef = useRef<RemoteAppItem | null>(null);
+
+  const handleUnzipPackage = async (sourceFile: string) => {
+    const targetDir = await appLocalDataDir();
+    const msg: string = await invoke('unzip_file', {
+      sourceFile: sourceFile,
+      targetDir,
+    });
+
+    console.log(msg);
+
+    message.info(msg);
+  };
+
+  const handleStartApp = async (appId: string) => {
+    const targetDir = await appLocalDataDir();
+    // const pendingApp = `${targetDir}${appId}/lowcode-app.jar`;
+    // const logPath = `${targetDir}${appId}/app.log`;
+    const pendingAppPath = await resolve(targetDir, appId, 'lowcode-app.jar');
+    const logPath = await resolve(targetDir, appId, 'appLog');
+    console.log('pendingAppPath', pendingAppPath);
+    // const resourceAppFile = await resolveResource(pendingAppPath);
+    // const resourceAppLogFile = await resolveResource(logPath);
+
+    const cmdRes = await new Command('run-start-app', [
+      '-jar',
+      pendingAppPath,
+      '--spring.profiles.active=test',
+      '--filter.enable=false',
+      '>>',
+      logPath,
+      '2>&1',
+      '&',
+    ]).execute();
+
+    // command.on('close', (data) => {
+    //   console.log('data', data);
+    //   console.log(
+    //     `command finished with code ${data.code} and signal ${data.signal}`
+    //   );
+    // });
+
+    // command.on('error', (error) => console.error(`command error: "${error}"`));
+    // command.stdout.on('data', (line) =>
+    //   console.log(`command stdout: "${line}"`)
+    // );
+    // command.stderr.on('data', (line) =>
+    //   console.log(`command stderr: "${line}"`)
+    // );
+    console.log(cmdRes.stdout);
+    console.log(cmdRes.stderr);
+
+    // const child = await command.spawn();
+    // const res = await child.write('message');
+    // console.log(res);
+    // console.log('pid: ', child.pid);
+  };
+
+  const handleStopApp = async (appId: string) => {
+    const resourcePath = await resolveResource('scripts/query_app_pid.sh');
+    const execRes = await new Command('run-sh-file', resourcePath).execute();
+    console.log(execRes);
+    if (execRes.code === 0 && execRes.stdout) {
+      console.log(execRes.stdout);
+
+      const killProcess = await new Command(
+        'run-kill-app',
+        execRes.stdout
+      ).execute();
+      console.log(killProcess);
+    }
+  };
+
+  const ACTION_MAP_INVOKE: Record<
+    ActionValue,
+    {
+      name?: string;
+      params?: string[];
+      func?: (params: any) => void;
+    }
+  > = {
+    unzip: {
+      func: handleUnzipPackage,
+    },
+    startup: {
+      func: handleStartApp,
+    },
+    stop: {
+      func: handleStopApp,
+    },
+    update: {
+      name: 'toggle_app_running_status',
+      params: ['appKey', 'appRunningStatus'],
+    },
+    delete: {
+      name: 'del_app_by_id',
+      params: ['appKey'],
+    },
+  };
+
+  const handleAppAction = (action: ActionValue) => async () => {
+    const { func, params, name } = ACTION_MAP_INVOKE[action];
+
+    if (func) func?.(params);
+
+    if (name) {
+      const res = await invoke(name);
+
+      console.log(res);
+    }
+  };
+
+  const initDescActionItems: DescriptionsProps['items'] = [
+    {
+      key: 'action',
+      label: '操作',
+      children: (
+        <Space size={24}>
+          {ActionList.map(({ id, value, label, actionStatus }) => (
+            <Button key={id} size="small" onClick={handleAppAction(value)}>
+              {label}
+            </Button>
+          ))}
+        </Space>
+      ),
+    },
+  ];
+
   const [descItems, setDescItems] = useState([
     ...initDescItems,
     ...initDescActionItems,
@@ -80,6 +241,7 @@ export const PageAppDetail = () => {
       const appStr: string = await invoke('get_app_by_id', {
         appKey: toNumber(id),
       });
+      const parsedAppDetail = JSON.parse(appStr);
 
       const {
         app_id,
@@ -90,7 +252,8 @@ export const PageAppDetail = () => {
         is_running,
         unzipped,
         created_at,
-      }: RemoteAppItem = JSON.parse(appStr);
+      }: RemoteAppItem = parsedAppDetail;
+      appDetailRef.current = parsedAppDetail;
       const pendingDescItems = [
         {
           key: 'id',
@@ -150,6 +313,7 @@ export const PageAppDetail = () => {
     <AppDetailContainer>
       <div>
         <Descriptions
+          size="small"
           title={
             <div className="flex items-center">
               <MyLink

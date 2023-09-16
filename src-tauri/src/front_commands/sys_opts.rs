@@ -1,9 +1,27 @@
 use std::ops::Range;
 use std::str::FromStr;
 use std::{net::TcpListener, thread};
-use tauri::Manager;
+use tauri::{AppHandle, Manager, Window};
 
 use crate::server;
+
+// Create the command:
+// This command must be async so that it doesn't run on the main thread.
+#[tauri::command]
+pub async fn close_splashscreen(app: tauri::AppHandle, window: tauri::Window) {
+  // close splashscreen
+  window
+    .get_window("splashscreen")
+    .expect("no window labeled 'splashscreen' found")
+    .close()
+    .unwrap();
+  // show main window
+  window
+    .get_window("main")
+    .expect("no window labeled 'main' found")
+    .show()
+    .unwrap();
+}
 
 #[tauri::command]
 pub async fn run_local_server(app: tauri::AppHandle) -> bool {
@@ -18,8 +36,14 @@ pub async fn run_local_server(app: tauri::AppHandle) -> bool {
 }
 
 #[tauri::command]
-pub fn get_available_port_list(port_range: String) -> Option<u16> {
-  let convert_vec: Vec<u16> = port_range.split("..").map(|s| s.parse().unwrap()).collect();
+pub fn get_available_port_list(port_range: &str) -> Option<u16> {
+  let convert_vec: Vec<u16> = port_range
+    .split("..")
+    .map(|s| match s.parse::<u16>() {
+      Ok(p) => p,
+      Err(_) => 9527,
+    })
+    .collect();
 
   let mut convert_range_pot = Range {
     start: convert_vec[0],

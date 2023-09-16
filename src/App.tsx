@@ -32,6 +32,10 @@ function App() {
     });
 
     message.success('Initial successfully data directory of app');
+
+    // setTimeout(async () => {
+    //   await invoke('close_splashscreen');
+    // }, 5000);
   };
 
   useEffect(() => {

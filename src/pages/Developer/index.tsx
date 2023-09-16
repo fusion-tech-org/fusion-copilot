@@ -90,99 +90,6 @@ export const DeveloperPage = () => {
     return orderedApps;
   };
 
-  const handleUnzipPackage = useCallback(async (sourceFile: string) => {
-    const targetDir = await appLocalDataDir();
-    const msg: string = await invoke('unzip_file', {
-      sourceFile: sourceFile,
-      targetDir,
-    });
-
-    console.log(msg);
-
-    message.info(msg);
-  }, []);
-
-  const handleStartApp = async (appId: string) => {
-    const targetDir = await appLocalDataDir();
-    // const pendingApp = `${targetDir}${appId}/lowcode-app.jar`;
-    // const logPath = `${targetDir}${appId}/app.log`;
-    const pendingAppPath = await resolve(targetDir, appId, 'lowcode-app.jar');
-    const logPath = await resolve(targetDir, appId, 'appLog');
-    console.log('pendingAppPath', pendingAppPath);
-    // const resourceAppFile = await resolveResource(pendingAppPath);
-    // const resourceAppLogFile = await resolveResource(logPath);
-
-    const cmdRes = await new Command('run-start-app', [
-      '-jar',
-      pendingAppPath,
-      '--spring.profiles.active=test',
-      '--filter.enable=false',
-      '>>',
-      logPath,
-      '2>&1',
-      '&',
-    ]).execute();
-
-    // command.on('close', (data) => {
-    //   console.log('data', data);
-    //   console.log(
-    //     `command finished with code ${data.code} and signal ${data.signal}`
-    //   );
-    // });
-
-    // command.on('error', (error) => console.error(`command error: "${error}"`));
-    // command.stdout.on('data', (line) =>
-    //   console.log(`command stdout: "${line}"`)
-    // );
-    // command.stderr.on('data', (line) =>
-    //   console.log(`command stderr: "${line}"`)
-    // );
-    console.log(cmdRes.stdout);
-    console.log(cmdRes.stderr);
-
-    // const child = await command.spawn();
-    // const res = await child.write('message');
-    // console.log(res);
-    // console.log('pid: ', child.pid);
-  };
-
-  const handleStopApp = async (appId: string) => {
-    const resourcePath = await resolveResource('scripts/query_app_pid.sh');
-    const execRes = await new Command('run-sh-file', resourcePath).execute();
-    console.log(execRes);
-    if (execRes.code === 0 && execRes.stdout) {
-      console.log(execRes.stdout);
-
-      const killProcess = await new Command(
-        'run-kill-app',
-        execRes.stdout
-      ).execute();
-      console.log(killProcess);
-    }
-  };
-
-  const handleUpdateApp = async (appId: string) => {
-    // const resourcePath = await resolveResource('lang/de.json');
-
-    // const langDe = JSON.parse(await readTextFile(resourcePath));
-
-    // console.log(langDe.hello);
-    const res = await invoke('toggle_app_running_status', {
-      appRunningStatus: true,
-      appKey: 1,
-    });
-
-    console.log(res, 'res');
-  };
-
-  const handleQueryAppDetail = async (appId: string) => {
-    const res: string = await invoke('get_app_by_id', {
-      appKey: 1,
-    });
-
-    console.log(JSON.parse(res));
-  };
-
   const handleDelApp = async (appId: string, zipName: string) => {
     // try {
     //   await removeDir(appId, {
@@ -302,10 +209,6 @@ export const DeveloperPage = () => {
       label: `部署管理`,
       children: (
         <DeploymentManage
-          onUnZip={handleUnzipPackage}
-          onStartup={handleStartApp}
-          onStop={handleStopApp}
-          onUpdate={handleUpdateApp}
           onDelete={handleDelApp}
           availableApps={availableApps}
         />

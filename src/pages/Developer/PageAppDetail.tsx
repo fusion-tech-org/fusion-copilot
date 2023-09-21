@@ -1,9 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Badge, Button, Descriptions, Space, message } from 'antd';
-import type { DescriptionsProps } from 'antd';
 import { LeftCircleOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api';
+import { debounce, isArray, isEmpty, isString, toNumber } from 'lodash';
+import {
+  appLocalDataDir,
+  resolve,
+  resolveResource,
+} from '@tauri-apps/api/path';
+import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs';
+import { Command } from '@tauri-apps/api/shell';
 
 import {
   AppDetailContainer,
@@ -11,167 +18,158 @@ import {
   AppDetailLogWrapper,
 } from './styles';
 import { MyLink } from 'components/index';
-import { RemoteAppItem } from './interface';
-import { toNumber } from 'lodash';
-import {
-  appLocalDataDir,
-  resolve,
-  resolveResource,
-} from '@tauri-apps/api/path';
-import { Command } from '@tauri-apps/api/shell';
+import { ActionValue, RemoteAppItem } from './interface';
+import { ActionList } from './constants';
 
-const initDescItems: DescriptionsProps['items'] = [
-  {
-    key: 'id',
-    label: 'ID',
-    children: '/',
-  },
-  {
-    key: 'app_id',
-    label: 'AppID',
-    children: '/',
-  },
-  {
-    key: 'app_version',
-    label: '版本',
-    children: '/',
-  },
-  {
-    key: 'created_at',
-    label: '创建时间',
-    children: '/',
-  },
-  {
-    key: 'unzipped',
-    label: '是否解压',
-    children: '/',
-    span: 2,
-  },
-  {
-    key: 'local_path',
-    label: '文件路径',
-    children: '/',
-    span: 3,
-  },
-  {
-    key: 'is_running',
-    label: '运行状态',
-    children: <Badge status="processing" text="未运行" />,
-    span: 3,
-  },
-];
-
-type ActionValue = 'unzip' | 'startup' | 'stop' | 'update' | 'delete';
-
-type ActionStatus = 'default' | 'warn' | 'primary' | 'danger';
-
-const ActionList: Readonly<
-  Array<{
-    label: string;
-    value: ActionValue;
-    actionStatus?: ActionStatus;
-    id: number;
-  }>
-> = [
-  {
-    id: 1,
-    label: '解压',
-    value: 'unzip',
-  },
-  {
-    id: 2,
-    label: '启动',
-    value: 'startup',
-  },
-  {
-    id: 3,
-    label: '停止',
-    value: 'stop',
-  },
-  {
-    id: 4,
-    label: '更新',
-    value: 'update',
-  },
-  {
-    id: 5,
-    label: '删除',
-    value: 'delete',
-  },
-];
+const DescriptionItem = Descriptions.Item;
 
 export const PageAppDetail = () => {
   const { id } = useParams();
-  const appDetailRef = useRef<RemoteAppItem | null>(null);
+  const [appDetail, setAppDetail] = useState<RemoteAppItem | null>(null);
+  const appKey = toNumber(id);
+  const [startingApp, setStartingApp] = useState(false);
+  const [startLogs, setStartLogs] = useState('');
 
-  const handleUnzipPackage = async (sourceFile: string) => {
-    const targetDir = await appLocalDataDir();
-    const msg: string = await invoke('unzip_file', {
-      sourceFile: sourceFile,
-      targetDir,
+  const getAppDir = async () => {
+    if (!appDetail || !appDetail.unzipped) {
+      message.info('当前应用不存在或未解压');
+      return;
+    };
+
+    const { app_id } = appDetail;
+
+    const localDataDir = await appLocalDataDir();
+    const appDirPath = await resolve(localDataDir, app_id);
+
+    return appDirPath;
+  };
+
+  const handleToggleAppZipStatus = async (zipStatus: boolean) => {
+    if (!appDetail) return;
+
+    const appStr: string = await invoke('toggle_app_zip_status', {
+      appKey,
+      appZipStatus: zipStatus
     });
 
-    console.log(msg);
+    console.log(appStr, 'appStr');
 
-    message.info(msg);
+    setAppDetail({
+      ...appDetail,
+      unzipped: zipStatus,
+    })
+    message.success('解压成功');
+  }
+
+  const handleToggleAppRunStatus = async (runStatus: boolean) => {
+    if (!appDetail) return;
+
+    const res: number = await invoke('toggle_app_running_status', {
+      appKey,
+      appRunningStatus: runStatus
+    });
+
+    console.log(res, 'res', typeof res);
+
+    if (res === 1) {
+      setAppDetail({
+        ...appDetail,
+        is_running: runStatus,
+      })
+    }
+  }
+
+  const handleUnzipPackage = async (sourceFilePath: string) => {
+    try {
+      const targetDir = await appLocalDataDir();
+
+      const msg: boolean = await invoke('unzip_file', {
+        sourceFile: sourceFilePath,
+        targetDir,
+      });
+
+      if (msg === true) {
+        handleToggleAppZipStatus(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const persistLogs = debounce(async (appId: string) => {
+    await writeTextFile(`${appId}/app.log`, startLogs, {
+      dir: BaseDirectory.AppLocalData
+    })
+  }, 800)
+
+  const recordAndPersistLogs = (data: string) => {
+    setStartLogs((prevLog => prevLog + data))
   };
 
   const handleStartApp = async (appId: string) => {
-    const targetDir = await appLocalDataDir();
-    // const pendingApp = `${targetDir}${appId}/lowcode-app.jar`;
-    // const logPath = `${targetDir}${appId}/app.log`;
-    const pendingAppPath = await resolve(targetDir, appId, 'lowcode-app.jar');
-    const logPath = await resolve(targetDir, appId, 'appLog');
-    console.log('pendingAppPath', pendingAppPath);
-    // const resourceAppFile = await resolveResource(pendingAppPath);
-    // const resourceAppLogFile = await resolveResource(logPath);
+    try {
+      setStartingApp(true);
+      const targetDir = await appLocalDataDir();
+      const pendingAppPath = await resolve(targetDir, appId, 'lowcode-app.jar');
+      const logPath = await resolve(targetDir, appId, 'appLog');
 
-    const cmdRes = await new Command('run-start-app', [
-      '-jar',
-      pendingAppPath,
-      '--spring.profiles.active=test',
-      '--filter.enable=false',
-      '>>',
-      logPath,
-      '2>&1',
-      '&',
-    ]).execute();
+      const cmd = new Command('run-start-app', [
+        '-jar',
+        pendingAppPath,
+        '--spring.profiles.active=test',
+        '--filter.enable=false',
+        '>>',
+        logPath,
+        '2>&1',
+        '&',
+      ]);
 
-    // command.on('close', (data) => {
-    //   console.log('data', data);
-    //   console.log(
-    //     `command finished with code ${data.code} and signal ${data.signal}`
-    //   );
-    // });
+      cmd.on('close', (data) => {
+        console.log(
+          `command finished with code ${data.code} and signal ${data.signal}`
+        );
+        setStartingApp(false);
+      });
+      cmd.stdout.once('data', () => {
+        handleToggleAppRunStatus(true);
+      })
 
-    // command.on('error', (error) => console.error(`command error: "${error}"`));
-    // command.stdout.on('data', (line) =>
-    //   console.log(`command stdout: "${line}"`)
-    // );
-    // command.stderr.on('data', (line) =>
-    //   console.log(`command stderr: "${line}"`)
-    // );
-    console.log(cmdRes.stdout);
-    console.log(cmdRes.stderr);
+      cmd.stdout.on('data', data => {
+        recordAndPersistLogs(data);
+      }
+      );
 
-    // const child = await command.spawn();
-    // const res = await child.write('message');
-    // console.log(res);
-    // console.log('pid: ', child.pid);
+      cmd.on('error', (error) => {
+        if (appDetail?.is_running) {
+          handleToggleAppRunStatus(false);
+        }
+        console.error(`command error: "${error}"`);
+        setStartingApp(false);
+      });
+
+      await cmd.execute();
+    } catch (e) {
+      setStartingApp(false);
+      console.log('Starting up the app failed', e);
+    }
+
   };
 
-  const handleStopApp = async (appId: string) => {
+  const handleStopApp = async () => {
+    setStartingApp(false);
     const resourcePath = await resolveResource('scripts/query_app_pid.sh');
     const execRes = await new Command('run-sh-file', resourcePath).execute();
-    console.log(execRes);
-    if (execRes.code === 0 && execRes.stdout) {
-      console.log(execRes.stdout);
 
+    if (execRes.code === 0 && execRes.stdout) {
       const killProcess = await new Command(
         'run-kill-app',
         execRes.stdout
       ).execute();
-      console.log(killProcess);
+
+      if (killProcess.code === 0) {
+        handleToggleAppRunStatus(false);
+      }
+
     }
   };
 
@@ -179,22 +177,21 @@ export const PageAppDetail = () => {
     ActionValue,
     {
       name?: string;
-      params?: string[];
+      params?: string[] | string;
       func?: (params: any) => void;
     }
   > = {
     unzip: {
       func: handleUnzipPackage,
+      params: 'sourceFilePath'
     },
     startup: {
       func: handleStartApp,
+      params: 'appId'
     },
     stop: {
       func: handleStopApp,
-    },
-    update: {
-      name: 'toggle_app_running_status',
-      params: ['appKey', 'appRunningStatus'],
+      params: 'appId'
     },
     delete: {
       name: 'del_app_by_id',
@@ -204,36 +201,35 @@ export const PageAppDetail = () => {
 
   const handleAppAction = (action: ActionValue) => async () => {
     const { func, params, name } = ACTION_MAP_INVOKE[action];
+    let convertParams: Record<string, any> | string;
+    const paramMap: Record<string, any> = {
+      sourceFilePath: 'local_path',
+      appId: 'app_id',
+      appKey: 'id',
+      appRunningStatus: ''
+    };
 
-    if (func) func?.(params);
+    if (isString(params) && !!func) {
+      convertParams = appDetail?.[paramMap[params]];
 
-    if (name) {
-      const res = await invoke(name);
+      func?.(convertParams);
+
+      return;
+    }
+
+    if (isArray(params) && !!name) {
+      convertParams = {};
+
+      params.forEach(key => {
+        (convertParams as Record<string, any>)[key] = appDetail?.[paramMap[key]];
+      })
+
+      const res = await invoke(convertParams as any);
 
       console.log(res);
     }
   };
 
-  const initDescActionItems: DescriptionsProps['items'] = [
-    {
-      key: 'action',
-      label: '操作',
-      children: (
-        <Space size={24}>
-          {ActionList.map(({ id, value, label, actionStatus }) => (
-            <Button key={id} size="small" onClick={handleAppAction(value)}>
-              {label}
-            </Button>
-          ))}
-        </Space>
-      ),
-    },
-  ];
-
-  const [descItems, setDescItems] = useState([
-    ...initDescItems,
-    ...initDescActionItems,
-  ]);
   const [appName, setAppName] = useState('未命名应用');
 
   const initAppDetail = async () => {
@@ -241,65 +237,12 @@ export const PageAppDetail = () => {
       const appStr: string = await invoke('get_app_by_id', {
         appKey: toNumber(id),
       });
-      const parsedAppDetail = JSON.parse(appStr);
+      const parsedAppDetail: RemoteAppItem = JSON.parse(appStr);
 
-      const {
-        app_id,
-        app_name,
-        app_version,
-        local_path,
-        id: primary_key,
-        is_running,
-        unzipped,
-        created_at,
-      }: RemoteAppItem = parsedAppDetail;
-      appDetailRef.current = parsedAppDetail;
-      const pendingDescItems = [
-        {
-          key: 'id',
-          label: 'ID',
-          children: primary_key,
-        },
-        {
-          key: 'app_id',
-          label: 'AppID',
-          children: app_id,
-        },
-        {
-          key: 'app_version',
-          label: '版本',
-          children: app_version,
-        },
-        {
-          key: 'created_at',
-          label: '创建时间',
-          children: created_at,
-        },
-        {
-          key: 'unzipped',
-          label: '是否解压',
-          children: unzipped ? '已解压' : '未解压',
-          span: 2,
-        },
-        {
-          key: 'local_path',
-          label: '文件路径',
-          children: local_path,
-          span: 3,
-        },
-        {
-          key: 'is_running',
-          label: '运行状态',
-          children: is_running ? (
-            <Badge status="processing" text="运行中" />
-          ) : (
-            <Badge status="default" text="未运行" />
-          ),
-          span: 3,
-        },
-      ];
+      const { app_name } = parsedAppDetail;
+
       setAppName(app_name);
-      setDescItems([...pendingDescItems, ...initDescActionItems]);
+      setAppDetail(parsedAppDetail);
     } catch (e) {
       console.log(e);
     }
@@ -308,6 +251,16 @@ export const PageAppDetail = () => {
   useEffect(() => {
     initAppDetail();
   }, []);
+
+  const {
+    app_id = '/',
+    app_version = '/',
+    created_at = '/',
+    unzipped = false,
+    local_path = '/',
+    is_running = false,
+  } = (appDetail || {}) as RemoteAppItem;
+  const isDisableAction = isEmpty(appDetail);
 
   return (
     <AppDetailContainer>
@@ -326,12 +279,42 @@ export const PageAppDetail = () => {
             </div>
           }
           bordered
-          items={descItems}
-        />
+        >
+          <DescriptionItem label="ID" key="id">{appDetail?.id || '/'}</DescriptionItem>
+          <DescriptionItem label="AppID" key="app_id">{app_id}</DescriptionItem>
+          <DescriptionItem label="版本" key="app_version">{app_version}</DescriptionItem>
+          <DescriptionItem label="创建时间" key="created_at">{created_at || '/'}</DescriptionItem>
+          <DescriptionItem label="是否解压" key="unzip" span={2}>{unzipped ? '已解压' : '未解压'}</DescriptionItem>
+          <DescriptionItem label="文件路径" key="local_path" span={3}>{local_path}</DescriptionItem>
+          <DescriptionItem label="运行状态" key="is_running" span={1}>{
+            is_running ? <Badge status="processing" text="运行中" /> : <Badge status="processing" text="未运行" />
+          }</DescriptionItem>
+          <DescriptionItem label="data.json" key="is_running" span={2}>
+            <Link to={`/developer/app/data-json/${app_id}`}>查看</Link>
+          </DescriptionItem>
+          <DescriptionItem label="操作" key="action" span={3}>{
+            <Space size={24}>
+              {ActionList.map(({ id, value, label, actionStatus }) => (
+                <Button key={id}
+                  size="small"
+                  disabled={isDisableAction
+                    || (value === 'unzip' && unzipped)
+                    || (value === 'startup' && is_running || startingApp)
+                    || (value === 'stop' && !is_running)
+                  }
+                  type={actionStatus}
+                  danger={value === 'delete'}
+                  onClick={handleAppAction(value)}>
+                  {label}
+                </Button>
+              ))}
+            </Space>
+          }</DescriptionItem>
+        </Descriptions>
       </div>
       <AppDetailLog>
         <div>操作日志</div>
-        <AppDetailLogWrapper></AppDetailLogWrapper>
+        <AppDetailLogWrapper>{startLogs}</AppDetailLogWrapper>
       </AppDetailLog>
     </AppDetailContainer>
   );

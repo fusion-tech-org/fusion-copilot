@@ -6,6 +6,7 @@ use tauri::Manager;
 
 use front_commands::action_opts::{
   create_ziwei_app, del_app_by_id, get_app_by_id, query_ziwei_apps, toggle_app_running_status,
+  toggle_app_zip_status,
 };
 use front_commands::file_opts::{get_resource_file, greet, unzip_file};
 use front_commands::sys_opts::{
@@ -74,6 +75,7 @@ fn main() {
       check_port_is_available,
       query_ziwei_apps,
       toggle_app_running_status,
+      toggle_app_zip_status,
       get_app_by_id,
       del_app_by_id
     ])

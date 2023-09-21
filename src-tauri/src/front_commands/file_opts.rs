@@ -21,7 +21,7 @@ pub fn greet(name: &str) -> String {
 
 #[tauri::command]
 pub fn unzip_file(source_file: &str, target_dir: &str) -> Result<bool, String> {
-  let file = fs::File::open(source_file).unwrap();
+  let file = fs::File::open(source_file).map_err(|err| err.to_string())?;
 
   let mut archive = ZipArchive::new(file).unwrap();
 
@@ -65,6 +65,7 @@ pub fn unzip_file(source_file: &str, target_dir: &str) -> Result<bool, String> {
       io::copy(&mut file, &mut out_file).unwrap();
     }
   }
+
   Ok((true))
 }
 

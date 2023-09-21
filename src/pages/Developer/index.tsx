@@ -166,8 +166,6 @@ export const DeveloperPage = () => {
     const localApps = await queryLocalApps();
     const remoteApps = await queryRemoteApps();
     const processedApps = remoteApps;
-
-    console.log(localApps, remoteApps);
     /**
      * NOTE: Base on local apps to create new app
      */

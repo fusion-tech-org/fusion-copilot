@@ -65,6 +65,7 @@
           "$APPLOCALDATA",
           "$APPLOCALDATA/*",
           "$APPLOCALDATA/fusion-tech",
+          "$APPLOCALDATA/*/*",
           "$APPDATA",
           "$HOME",
           "$RESOURCE/*",

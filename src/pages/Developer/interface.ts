@@ -14,4 +14,9 @@ export interface RemoteAppItem {
   is_running: boolean;
   unzipped: boolean;
   created_at: string;
+  [index: string]: any;
 }
+
+export type ActionValue = 'unzip' | 'startup' | 'stop' |  'delete';
+
+export type ActionStatus = "default" | "primary" | "link" | "text" | "dashed" | undefined

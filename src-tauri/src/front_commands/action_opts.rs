@@ -87,6 +87,16 @@ pub fn toggle_app_running_status(app_key: i32, app_running_status: bool) -> usiz
     .expect("Can not find the app")
 }
 
+#[tauri::command]
+pub fn toggle_app_zip_status(app_key: i32, app_zip_status: bool) -> usize {
+  let conn = &mut establish_connection();
+
+  diesel::update(ziwei_apps.find(app_key))
+    .set(unzipped.eq(app_zip_status))
+    .execute(conn)
+    .expect("failed to update app's unzipped property")
+}
+
 // #[tauri::command]
 // pub fn create_note(note_title: &str, note_content: &str) -> usize {
 //   let new_note = NewNote {

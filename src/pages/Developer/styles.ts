@@ -55,4 +55,7 @@ export const AppDetailLogWrapper = styled.div`
   padding: 12px;
   font-size: 12px;
   overflow: auto;
+  background-color: #222;
+  color: #fff;
+  line-height: 1.8;
 `;

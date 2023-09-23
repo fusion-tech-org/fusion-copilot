@@ -1,4 +1,11 @@
-import { TabsProps, Tabs, message, Button, Modal } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  HomeOutlined,
+  DeleteOutlined,
+  SettingOutlined,
+  ReloadOutlined,
+  ExclamationCircleFilled,
+} from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api';
 import {
   readDir,
@@ -9,29 +16,15 @@ import {
   readBinaryFile,
   exists,
 } from '@tauri-apps/api/fs';
-import {
-  appLocalDataDir,
-  resolve,
-  resolveResource,
-} from '@tauri-apps/api/path';
-import { Child, Command, open } from '@tauri-apps/api/shell';
-import { useCallback, useEffect, useState } from 'react';
-
+import { TabsProps, Tabs, message, Button, Modal } from 'antd';
+import { MyLink } from 'components/index';
+import { DB_CUD_SUCCESS_FLAG } from 'constants/index';
+import { find, orderBy, remove } from 'lodash';
+import { Link } from 'react-router-dom';
+import { getAppNameFromPath, stopApp } from 'utils/index';
 import { DeploymentManage } from './components/DeploymentManage';
 import { ToolManage } from './components/ToolManage';
-import { Link } from 'react-router-dom';
-import {
-  HomeOutlined,
-  DeleteOutlined,
-  SettingOutlined,
-  ReloadOutlined,
-  ExclamationCircleFilled,
-} from '@ant-design/icons';
-import { find, orderBy, remove } from 'lodash';
-import { MyLink } from 'components/index';
 import { LocalAppItem, RemoteAppItem } from './interface';
-import { DB_CUD_SUCCESS_FLAG } from 'constants/index';
-import { getAppNameFromPath, stopApp } from 'utils/index';
 
 const VALID_PACKAGE_PREFIX = '紫薇';
 
@@ -48,8 +41,7 @@ const { confirm } = Modal;
 
 export const DeveloperPage = () => {
   const [availableApps, setAvailableApps] = useState<RemoteAppItem[]>([]);
-  const [activeTabItem, setActiveTabItem] =
-    useState<TabsItems>('deployment_manage');
+  const [activeTabItem, setActiveTabItem] = useState<TabsItems>('deployment_manage');
 
   const onChange = (key: string) => {
     setActiveTabItem(key as TabsItems);
@@ -62,6 +54,7 @@ export const DeveloperPage = () => {
     });
     const validLocalApps = [];
     const validAppFileRE = new RegExp(
+      // eslint-disable-next-line no-useless-escape
       `^(${VALID_PACKAGE_PREFIX}).*(?<=_)([a-z0-9]{24})(?=_).*(\.zip)$`,
       'ig'
     );
@@ -76,8 +69,7 @@ export const DeveloperPage = () => {
 
       if (validAppFileRE.test(entryName)) {
         const [appFileName, _] = entryName.split('.zip');
-        const [_prefix, appName, appId, appVersion] =
-          appFileName?.split('_') ?? [];
+        const [_prefix, appName, appId, appVersion] = appFileName?.split('_') ?? [];
 
         const packItem = {
           aid: appId,
@@ -136,7 +128,7 @@ export const DeveloperPage = () => {
 
       await removeDBAppById(curRemoteApp.id);
 
-      remove(processedApps, (app) => app.app_id === curAppId);
+      remove(processedApps, app => app.app_id === curAppId);
     }
 
     setAvailableApps(processedApps);
@@ -152,18 +144,18 @@ export const DeveloperPage = () => {
         const isSuccess = await stopApp();
 
         if (!isSuccess) {
-          message.info("关闭应用服务失败，请稍后重试!");
+          message.info('关闭应用服务失败，请稍后重试!');
           return;
         }
       }
 
       /**
-      * NOTE: check the corresponding fold whether existed
-      * 
-      * we can judge it via `unzipped` property, but in specific scenario that user remove them manually, it'll not work.
-      */
+       * NOTE: check the corresponding fold whether existed
+       *
+       * we can judge it via `unzipped` property, but in specific scenario that user remove them manually, it'll not work.
+       */
       const isUnzipFoldExist = await exists(app_id, {
-        dir: BaseDirectory.AppLocalData
+        dir: BaseDirectory.AppLocalData,
       });
 
       if (isUnzipFoldExist) {
@@ -255,7 +247,7 @@ export const DeveloperPage = () => {
       onOk() {
         confirmDelAllApps();
       },
-      onCancel() { },
+      onCancel() {},
     });
   };
 
@@ -270,12 +262,7 @@ export const DeveloperPage = () => {
     {
       key: 'deployment_manage',
       label: `部署管理`,
-      children: (
-        <DeploymentManage
-          onDelete={handleDelApp}
-          availableApps={availableApps}
-        />
-      ),
+      children: <DeploymentManage onDelete={handleDelApp} availableApps={availableApps} />,
     },
     {
       key: 'tools_manage',
@@ -331,9 +318,7 @@ export const DeveloperPage = () => {
         defaultActiveKey="deployment_manage"
         items={items}
         onChange={onChange}
-        tabBarExtraContent={
-          activeTabItem === 'deployment_manage' ? OperationsSlot : null
-        }
+        tabBarExtraContent={activeTabItem === 'deployment_manage' ? OperationsSlot : null}
       />
     </section>
   );

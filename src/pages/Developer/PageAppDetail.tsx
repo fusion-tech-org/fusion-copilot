@@ -20,6 +20,7 @@ import {
 import { MyLink } from 'components/index';
 import { ActionValue, RemoteAppItem } from './interface';
 import { ActionList } from './constants';
+import { stopApp } from 'utils/index';
 
 const DescriptionItem = Descriptions.Item;
 
@@ -157,19 +158,11 @@ export const PageAppDetail = () => {
 
   const handleStopApp = async () => {
     setStartingApp(false);
-    const resourcePath = await resolveResource('scripts/query_app_pid.sh');
-    const execRes = await new Command('run-sh-file', resourcePath).execute();
 
-    if (execRes.code === 0 && execRes.stdout) {
-      const killProcess = await new Command(
-        'run-kill-app',
-        execRes.stdout
-      ).execute();
+    const isSuccess = await stopApp();
 
-      if (killProcess.code === 0) {
-        handleToggleAppRunStatus(false);
-      }
-
+    if (isSuccess) {
+      handleToggleAppRunStatus(false);
     }
   };
 

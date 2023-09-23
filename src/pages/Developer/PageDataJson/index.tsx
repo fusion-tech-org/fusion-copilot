@@ -1,16 +1,19 @@
 import { LeftCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { exists, BaseDirectory } from '@tauri-apps/api/fs';
+import { exists, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { appLocalDataDir, resolve } from '@tauri-apps/api/path';
+// import { useInternal } from 'store/useInternal';
+import { Graph } from './components/Graph';
 
 const LOWCODE_APP_JAR_NAME = 'lowcode-app';
 
 export const PageDataJson = () => {
   const { aid } = useParams();
   const navigate = useNavigate();
+  const [pendingDataJson, setPendingDataJson] = useState('');
 
-  const [activeDataJson, setActiveDataJson] = useState(null);
+  // const [setGraph] = useInternal(state => ([state.setGraph]))
 
   const initDataJson = async () => {
     if (!aid) return;
@@ -24,9 +27,12 @@ export const PageDataJson = () => {
 
     if (isLowcodeDirExisted) {
       const jsonPath = await resolve(appLocalDataDirPath, aid, LOWCODE_APP_JAR_NAME, 'BOOT-INF/classes/data/data.json');
-      const dataJson = require(jsonPath);
-
-      setActiveDataJson(dataJson)
+      console.log(jsonPath);
+      const dataJson = await readTextFile(`${aid}/${LOWCODE_APP_JAR_NAME}/BOOT-INF/classes/data/data.json`, {
+        dir: BaseDirectory.AppLocalData
+      })
+      setPendingDataJson(dataJson);
+      // setGraph(dataJson);
     }
   }
 
@@ -35,13 +41,15 @@ export const PageDataJson = () => {
   }, []);
 
   return (
-    <div>
-      data.json
-
-      <div onClick={() => navigate(-1)}>
-        <LeftCircleOutlined />
-      </div>
-
+    <div className='w-screen h-screen relative overflow-hidden'>
+      <header className="w-full absolute top-0 z-[1]">
+        <div className='flex h-10 w-full px-4 items-center bg-white/[.05]'>
+          <div onClick={() => navigate(-1)} className="text-slate-200">
+            <LeftCircleOutlined />
+          </div>
+        </div>
+      </header>
+      <Graph json={pendingDataJson} className='w-full h-full' />
     </div>
   )
 };

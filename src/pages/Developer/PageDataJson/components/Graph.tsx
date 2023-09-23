@@ -1,4 +1,4 @@
-import { useState, useCallback, MouseEvent, ForwardRefRenderFunction, useEffect, useImperativeHandle } from "react";
+import { useState, useCallback, MouseEvent, ForwardRefRenderFunction, useEffect, useImperativeHandle, forwardRef } from "react";
 import { NodeProps, ElkRoot, Canvas, Edge, EdgeProps } from 'reaflow';
 import { useLongPress } from "use-long-press";
 import { Space } from "react-zoomable-ui";
@@ -11,6 +11,7 @@ import { useInternal } from "store/useInternal";
 import { ThemeProvider } from "styled-components";
 import { StyledEditorWrapper } from "./styles";
 import { darkTheme, lightTheme } from "../constants";
+import { CustomNode } from './CustomNode';
 
 export type GraphRef = ExternalStore;
 
@@ -155,6 +156,5 @@ const GraphRef: ForwardRefRenderFunction<GraphRef, GraphProps> = (
   )
 }
 
-
-
+export const Graph = forwardRef<GraphRef, GraphProps>(GraphRef);
 

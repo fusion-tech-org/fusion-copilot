@@ -1,4 +1,4 @@
-import { TabsProps, Tabs, message, Button } from 'antd';
+import { TabsProps, Tabs, message, Button, Modal } from 'antd';
 import { invoke } from '@tauri-apps/api';
 import {
   readDir,
@@ -7,6 +7,7 @@ import {
   removeDir,
   removeFile,
   readBinaryFile,
+  exists,
 } from '@tauri-apps/api/fs';
 import {
   appLocalDataDir,
@@ -24,11 +25,13 @@ import {
   DeleteOutlined,
   SettingOutlined,
   ReloadOutlined,
+  ExclamationCircleFilled,
 } from '@ant-design/icons';
 import { find, orderBy, remove } from 'lodash';
 import { MyLink } from 'components/index';
 import { LocalAppItem, RemoteAppItem } from './interface';
 import { DB_CUD_SUCCESS_FLAG } from 'constants/index';
+import { getAppNameFromPath, stopApp } from 'utils/index';
 
 const VALID_PACKAGE_PREFIX = '紫薇';
 
@@ -40,6 +43,8 @@ export interface PackageList {
 
 type PositionType = 'left' | 'right';
 type TabsItems = 'deployment_manage' | 'tools_manage';
+
+const { confirm } = Modal;
 
 export const DeveloperPage = () => {
   const [availableApps, setAvailableApps] = useState<RemoteAppItem[]>([]);
@@ -90,63 +95,6 @@ export const DeveloperPage = () => {
     return orderedApps;
   };
 
-  const handleDelApp = async (appId: string, zipName: string) => {
-    // try {
-    //   await removeDir(appId, {
-    //     dir: BaseDirectory.AppLocalData,
-    //     recursive: true,
-    //   });
-    //   await removeFile(zipName, {
-    //     dir: BaseDirectory.Download,
-    //   });
-    //   message.success('文件删除成功');
-    // } catch (err) {
-    //   console.error(err);
-    //   message.info('文件删除失败');
-    // }
-    const res = await invoke('del_app_by_id', {
-      appKey: 1,
-    });
-
-    console.log(res, 'res');
-  };
-
-  const saveAppToDB = async (newApp: LocalAppItem) => {
-    try {
-      const { aid, version, name, localPath } = newApp;
-      await invoke('create_ziwei_app', {
-        name,
-        newAppId: aid,
-        version,
-        localAppPath: localPath,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const removeAppById = async (appPrimaryKey: number) => {
-    try {
-      const delRes = await invoke('del_app_by_id', {
-        appKey: appPrimaryKey,
-      });
-
-      if (delRes === DB_CUD_SUCCESS_FLAG) {
-        return true;
-      }
-
-      return false;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
-  };
-
-  const handleDelAllApps = async () => {
-    const queryApps = await invoke('query_ziwei_apps');
-
-    console.log('queryApps', queryApps);
-  };
   const queryRemoteApps = async () => {
     try {
       const queryApps = await invoke('query_ziwei_apps');
@@ -186,12 +134,129 @@ export const DeveloperPage = () => {
 
       if (find(localApps, ['aid', curAppId])) continue;
 
-      await removeAppById(curRemoteApp.id);
+      await removeDBAppById(curRemoteApp.id);
 
       remove(processedApps, (app) => app.app_id === curAppId);
     }
 
     setAvailableApps(processedApps);
+  };
+
+  const handleDelApp = async (appItem: RemoteAppItem, showMsg = true) => {
+    const { id, is_running, app_id, local_path } = appItem;
+    const appFullName = getAppNameFromPath(local_path)!;
+
+    try {
+      // if the app is running, we should to stop it first
+      if (is_running) {
+        const isSuccess = await stopApp();
+
+        if (!isSuccess) {
+          message.info("关闭应用服务失败，请稍后重试!");
+          return;
+        }
+      }
+
+      /**
+      * NOTE: check the corresponding fold whether existed
+      * 
+      * we can judge it via `unzipped` property, but in specific scenario that user remove them manually, it'll not work.
+      */
+      const isUnzipFoldExist = await exists(app_id, {
+        dir: BaseDirectory.AppLocalData
+      });
+
+      if (isUnzipFoldExist) {
+        // remove unzip directory
+        await removeDir(app_id, {
+          dir: BaseDirectory.AppLocalData,
+          recursive: true,
+        });
+      }
+
+      const isZipFileExist = await exists(appFullName, {
+        dir: BaseDirectory.Download,
+      });
+
+      if (isZipFileExist) {
+        // remove app zip file
+        await removeFile(appFullName, {
+          dir: BaseDirectory.Download,
+        });
+      }
+
+      // remove record from database
+      await invoke('del_app_by_id', {
+        appKey: id,
+      });
+
+      await compareLocalAppToRemote();
+
+      showMsg && message.success('文件删除成功');
+    } catch (err) {
+      console.error(err);
+      showMsg && message.info('文件删除失败');
+    }
+  };
+
+  const saveAppToDB = async (newApp: LocalAppItem) => {
+    try {
+      const { aid, version, name, localPath } = newApp;
+      await invoke('create_ziwei_app', {
+        name,
+        newAppId: aid,
+        version,
+        localAppPath: localPath,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const removeDBAppById = async (appPrimaryKey: number) => {
+    try {
+      const delRes = await invoke('del_app_by_id', {
+        appKey: appPrimaryKey,
+      });
+
+      if (delRes === DB_CUD_SUCCESS_FLAG) {
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  };
+
+  const confirmDelAllApps = async () => {
+    try {
+      for (let i = 0; i < availableApps.length; i++) {
+        await handleDelApp(availableApps[i], false);
+      }
+
+      setAvailableApps([]);
+      message.success('删除全部应用成功');
+    } catch (e) {
+      console.error(e);
+
+      message.info('删除全部应用失败');
+    }
+  };
+
+  const handleDelAllApps = () => {
+    confirm({
+      title: '请再次确认是否清空所有数据',
+      icon: <ExclamationCircleFilled />,
+      content: '该操作会删除所有相关的安装包以及文件',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        confirmDelAllApps();
+      },
+      onCancel() { },
+    });
   };
 
   useEffect(() => {

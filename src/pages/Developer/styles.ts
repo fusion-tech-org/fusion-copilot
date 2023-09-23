@@ -13,9 +13,9 @@ export const AppZipListWrapper = styled.div`
     &::-webkit-scrollbar {
       display: block;
     }
-    .adjust-scrollbar {
+    /* .adjust-scrollbar {
       margin-right: -4px;
-    }
+    } */
   }
 
   &::-webkit-scrollbar {

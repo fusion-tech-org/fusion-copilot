@@ -10,6 +10,9 @@ import { ImageHandler } from 'pages/Toolkit/ImageHandler';
 import { StaticServer } from 'pages/Toolkit/StaticServer';
 import { NotesPage } from 'pages/Notes';
 import { ImageJSHandler } from 'pages/Toolkit/ImageJSHandler';
+import { PageDataJsonExport } from 'pages/Developer/PageDataJsonExport';
+import { PageToolManage } from 'pages/Developer/PageToolManage';
+import { PageMigrateApp } from 'pages/Developer/PageMigrateApp';
 
 export const rootRouter = createBrowserRouter([
   {
@@ -23,6 +26,21 @@ export const rootRouter = createBrowserRouter([
   {
     path: '/developer',
     element: <DeveloperPage />,
+    children: [
+      {
+        path: '/developer',
+        element: <PageToolManage />,
+        index: true,
+      },
+      {
+        path: '/developer/export-json',
+        element: <PageDataJsonExport />
+      },
+      {
+        path: '/developer/migrate-app',
+        element: <PageMigrateApp />
+      },
+    ]
   },
   {
     path: '/developer/global-setting',

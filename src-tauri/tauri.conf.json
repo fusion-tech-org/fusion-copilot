@@ -66,8 +66,13 @@
           "$APPLOCALDATA/*",
           "$APPLOCALDATA/fusion-tech",
           "$APPLOCALDATA/*/*",
+          "$APPLOCALDATA/**/*",
           "$APPDATA",
           "$HOME",
+          "$HOME/*",
+          "$HOME/**/*",
+          "$DESKTOP",
+          "$DESKTOP/*",
           "$RESOURCE/*",
           "$RESOURCE/lang/*",
           "$RESOURCE/scripts/*"
@@ -97,7 +102,10 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "resources": ["lang/*", "scripts/*"]
+      "resources": [
+        "lang/*",
+        "scripts/*"
+      ]
     },
     "systemTray": {
       "iconPath": "icons/icon.png",

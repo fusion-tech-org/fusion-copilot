@@ -1,20 +1,32 @@
-import React, { FC } from 'react';
-import { List, Skeleton } from 'antd';
-import { LockOutlined, RestOutlined } from '@ant-design/icons';
+import { FC } from 'react';
+import { List, Skeleton, Modal } from 'antd';
+import { ExclamationCircleFilled, LockOutlined, RestOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 import { AppZipListWrapper } from '../styles';
 import { RemoteAppItem } from '../interface';
 interface DeploymentManageProps {
-  onDelete: (appId: string, zipName: string) => void;
+  onDelete: (appItem: RemoteAppItem) => void;
   availableApps: RemoteAppItem[];
 }
+
+const { confirm } = Modal;
 
 export const DeploymentManage: FC<DeploymentManageProps> = (props) => {
   const { onDelete, availableApps } = props;
 
-  const handleDelete = (appId: string, zipName: string) => () => {
-    onDelete?.(appId, zipName);
+  const handleDelete = (appItem: RemoteAppItem) => () => {
+    confirm({
+      title: '请再次确认是否删除该条数据',
+      icon: <ExclamationCircleFilled />,
+      content: '该操作会清空所有相关的安装包以及文件',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        onDelete?.(appItem);
+      },
+      onCancel() { },
+    });
   };
 
   return (
@@ -45,7 +57,8 @@ export const DeploymentManage: FC<DeploymentManageProps> = (props) => {
                 <Link to={`/developer/app/${item.id}`}>详情</Link>,
                 <span
                   key="delete"
-                  onClick={handleDelete(item.app_id, item.local_path)}
+                  className="cursor-pointer hover:text-rose-500 duration-300"
+                  onClick={handleDelete(item)}
                 >
                   删除
                 </span>,

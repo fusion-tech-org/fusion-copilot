@@ -1,5 +1,6 @@
 import { resolveResource } from "@tauri-apps/api/path";
 import { Command } from "@tauri-apps/api/shell";
+import { get } from "lodash";
 
 export const stopApp = async (port?: number) => {
   try {
@@ -24,4 +25,16 @@ export const stopApp = async (port?: number) => {
 
 export const getAppNameFromPath = (localPath: string) => {
   return localPath.split('/').pop();
+};
+
+export interface ZiWeiResponse {
+  data: unknown;
+  responseMeta: {
+    status: number;
+    success: boolean
+  }
+  [index: string]: unknown;
+}
+export const checkValidResponseForZiWei = (res: ZiWeiResponse) => {
+  return get(res, 'responseMeta.success', false);
 };

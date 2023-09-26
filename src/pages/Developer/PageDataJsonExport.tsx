@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select, Space, message } from "antd";
+import { Button, Form, Input, Select, Space, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
 import axios from 'axios';
@@ -64,7 +64,11 @@ export const PageDataJsonExport = () => {
 
       form.resetFields();
 
-      message.success('导出成功');
+      notification.success({
+        message: '应用data.json导出成功',
+        description: '',
+        placement: 'bottomRight'
+      });
     } catch (e) {
       console.error(e);
     }

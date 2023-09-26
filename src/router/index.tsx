@@ -9,6 +9,7 @@ import { ToolKitPage } from 'pages/Toolkit';
 import { ImageHandler } from 'pages/Toolkit/ImageHandler';
 import { StaticServer } from 'pages/Toolkit/StaticServer';
 import { NotesPage } from 'pages/Notes';
+import { WhiteboardPage } from 'pages/Whiteboard';
 import { ImageJSHandler } from 'pages/Toolkit/ImageJSHandler';
 import { PageDataJsonExport } from 'pages/Developer/PageDataJsonExport';
 import { PageToolManage } from 'pages/Developer/PageToolManage';
@@ -22,6 +23,10 @@ export const rootRouter = createBrowserRouter([
   {
     path: '/notes',
     element: <NotesPage />,
+  },
+  {
+    path: '/whiteboard',
+    element: <WhiteboardPage />,
   },
   {
     path: '/developer',

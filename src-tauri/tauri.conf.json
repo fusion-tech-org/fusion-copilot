@@ -105,7 +105,31 @@
       "resources": [
         "lang/*",
         "scripts/*"
-      ]
+      ],
+      "category": "Productivity",
+      "copyright": "2024 @FusionTech",
+      "windows": {
+        "allowDowngrades": true,
+        "certificateThumbprint": null,
+        "digestAlgorithm": null,
+        "nsis": null,
+        "timestampUrl": null,
+        "tsp": false,
+        "webviewFixedRuntimePath": null,
+        "webviewInstallMode": {
+          "silent": true,
+          "type": "downloadBootstrapper"
+        },
+        "wix": {
+          "language": [
+            "zh-CN",
+            "en-US"
+          ]
+        }
+      },
+      "macOS": {
+        "minimumSystemVersion": "10.13"
+      }
     },
     "systemTray": {
       "iconPath": "icons/icon.png",

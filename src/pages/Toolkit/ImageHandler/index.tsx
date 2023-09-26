@@ -1,19 +1,19 @@
-import { invoke } from '@tauri-apps/api';
 import { getClient, Body, ResponseType } from '@tauri-apps/api/http';
 import { Button, Input } from 'antd';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
 
 import { Link } from 'react-router-dom';
-import { useStore } from 'src/store';
+// import { useStore } from 'src/store';
 
 export const ImageHandler = () => {
-  const [urlValue, setUrlValue] = useState<string | null>(null);
-  const isLocalServerRunning = useStore((state) => state.isLocalServerRunning);
+  // const [urlValue, setUrlValue] = useState<string | null>(null);
+  // const isLocalServerRunning = useStore((state) => state.isLocalServerRunning);
 
   const handleChangeUrl = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    setUrlValue(value);
+    // setUrlValue(value);
+    console.log(value);
   };
 
   const handleGetRequest = async () => {
@@ -48,7 +48,7 @@ export const ImageHandler = () => {
       // });
 
       console.log(typeof response.data);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   return (

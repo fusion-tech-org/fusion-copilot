@@ -1,33 +1,33 @@
-import { invoke } from '@tauri-apps/api';
-import { Avatar, Button, Form, Input, List, message } from 'antd';
-import { useRef } from 'react';
+// import { invoke } from '@tauri-apps/api';
+import { Avatar, List } from 'antd';
+// import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import type { FormInstance } from 'antd/es/form';
+// import type { FormInstance } from 'antd/es/form';
 import { MyLink } from 'components/common-styles';
 import { LeftCircleOutlined } from '@ant-design/icons';
 
-type FieldType = {
-  title?: string;
-  body?: string;
-};
+// type FieldType = {
+//   title?: string;
+//   body?: string;
+// };
 
 export const ToolKitPage = () => {
-  const formRef = useRef<FormInstance<FieldType>>(null);
-  const handleFinish = async () => {
-    const fieldValues = formRef.current?.getFieldsValue();
-    if (!fieldValues) return;
-    const { title, body } = fieldValues;
-    const res = await invoke('create_post', {
-      title,
-      body,
-    });
-    console.log(res, 'res');
+  // const formRef = useRef<FormInstance<FieldType>>(null);
+  // const handleFinish = async () => {
+  //   const fieldValues = formRef.current?.getFieldsValue();
+  //   if (!fieldValues) return;
+  //   const { title, body } = fieldValues;
+  //   const res = await invoke('create_post', {
+  //     title,
+  //     body,
+  //   });
+  //   console.log(res, 'res');
 
-    if (res === 1) {
-      message.success('创建成功');
-      formRef.current?.resetFields();
-    }
-  };
+  //   if (res === 1) {
+  //     message.success('创建成功');
+  //     formRef.current?.resetFields();
+  //   }
+  // };
 
   const data = [
     {

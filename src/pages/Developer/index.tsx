@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   HomeOutlined,
   DeleteOutlined,
@@ -10,13 +10,11 @@ import { invoke } from '@tauri-apps/api';
 import {
   readDir,
   BaseDirectory,
-  readTextFile,
   removeDir,
   removeFile,
-  readBinaryFile,
   exists,
 } from '@tauri-apps/api/fs';
-import { TabsProps, Tabs, message, Button, Modal } from 'antd';
+import { TabsProps, Tabs, message, Modal } from 'antd';
 import { MyLink } from 'components/index';
 import { DB_CUD_SUCCESS_FLAG } from 'constants/index';
 import { find, orderBy, remove } from 'lodash';
@@ -247,7 +245,7 @@ export const DeveloperPage = () => {
       onOk() {
         confirmDelAllApps();
       },
-      onCancel() {},
+      onCancel() { },
     });
   };
 

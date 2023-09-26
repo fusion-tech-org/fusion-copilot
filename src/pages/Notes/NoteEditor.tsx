@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC } from "react";
 import { Editor } from 'novel';
 
 import { EditorWrapper } from "./styles";
@@ -24,15 +24,15 @@ interface NodeEditorProps {
   initContent?: JSONContent | string;
 }
 
-const editorDefaultValue = {
-  "type": "doc",
-  "content": [
-    {
-      "type": "text",
-      "text": "试试'\\'命令输入..."
-    },
-  ]
-};
+// const editorDefaultValue = {
+//   "type": "doc",
+//   "content": [
+//     {
+//       "type": "text",
+//       "text": "试试'\\'命令输入..."
+//     },
+//   ]
+// };
 
 
 const LOCAL_STORAGE_PREFIX = 'note__content_';
@@ -44,7 +44,7 @@ export const NoteEditor: FC<NodeEditorProps> = (props) => {
     console.log(editor);
   };
 
-  const handleChangeEditable = (editor: any) => {
+  const handleChangeEditable = () => {
     return true;
   };
 

@@ -6,7 +6,7 @@ export const stopApp = async (port?: number) => {
   try {
     const resourcePath = await resolveResource('scripts/query_app_pid.sh');
     const execRes = await new Command('run-sh-file', resourcePath).execute();
-
+    console.log(port);
     if (execRes.code === 0 && execRes.stdout) {
       const killProcess = await new Command(
         'run-kill-app',

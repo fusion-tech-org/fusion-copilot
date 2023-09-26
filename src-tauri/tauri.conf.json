@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "FusionCopilot",
-    "version": "0.1.1"
+    "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
@@ -107,7 +107,7 @@
         "scripts/*"
       ],
       "category": "Productivity",
-      "copyright": "2024 @FusionTech",
+      "copyright": "© 2023 FusionTech",
       "windows": {
         "allowDowngrades": true,
         "certificateThumbprint": null,
@@ -128,7 +128,11 @@
         }
       },
       "macOS": {
-        "minimumSystemVersion": "10.13"
+        "minimumSystemVersion": "10.13",
+        "exceptionDomain": "localhost"
+      },
+      "deb": {
+        "files": {}
       }
     },
     "systemTray": {
@@ -156,6 +160,16 @@
         "label": "splashscreen",
         "visible": false
       }
-    ]
+    ],
+    "updater": {
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGMzZBODIyMTkzOUVBRTYKUldUbTZqa1pJcWcyZjQ2NmFoQXhFMG1zVVZOL1Q2TFF0dXFLeXF0dy9VdWF5aTZZeXNPZUVFNDYK",
+      "windows": {
+        "installMode": "passive",
+        "installerArgs": []
+      },
+      "endpoints": []
+    }
   }
 }

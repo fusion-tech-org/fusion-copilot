@@ -101,7 +101,7 @@ export const PageMigrateApp = () => {
       <FormItem className="text-center" >
         <Space size={24}>
           <Button onClick={() => navigate(-1)}>返 回</Button>
-          <Button type="primary" onClick={handleConfirm}>确 定</Button>
+          <Button type="primary" className="bg-[var(--theme-primary)]" onClick={handleConfirm}>确 定</Button>
         </Space>
       </FormItem>
     </Form>

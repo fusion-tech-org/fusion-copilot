@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Badge, Button, Descriptions, Space, message } from 'antd';
 import { LeftCircleOutlined } from '@ant-design/icons';
 import { invoke } from '@tauri-apps/api';
-import { debounce, isArray, isEmpty, isString, toNumber } from 'lodash';
+import { isArray, isEmpty, isString, toNumber } from 'lodash';
 import {
   appLocalDataDir,
   resolve,
-  resolveResource,
 } from '@tauri-apps/api/path';
-import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs';
+// import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs';
 import { Command } from '@tauri-apps/api/shell';
 
 import {
@@ -31,19 +30,19 @@ export const PageAppDetail = () => {
   const [startingApp, setStartingApp] = useState(false);
   const [startLogs, setStartLogs] = useState('');
 
-  const getAppDir = async () => {
-    if (!appDetail || !appDetail.unzipped) {
-      message.info('当前应用不存在或未解压');
-      return;
-    };
+  // const getAppDir = async () => {
+  //   if (!appDetail || !appDetail.unzipped) {
+  //     message.info('当前应用不存在或未解压');
+  //     return;
+  //   };
 
-    const { app_id } = appDetail;
+  //   const { app_id } = appDetail;
 
-    const localDataDir = await appLocalDataDir();
-    const appDirPath = await resolve(localDataDir, app_id);
+  //   const localDataDir = await appLocalDataDir();
+  //   const appDirPath = await resolve(localDataDir, app_id);
 
-    return appDirPath;
-  };
+  //   return appDirPath;
+  // };
 
   const handleToggleAppZipStatus = async (zipStatus: boolean) => {
     if (!appDetail) return;
@@ -97,11 +96,11 @@ export const PageAppDetail = () => {
     }
   };
 
-  const persistLogs = debounce(async (appId: string) => {
-    await writeTextFile(`${appId}/app.log`, startLogs, {
-      dir: BaseDirectory.AppLocalData
-    })
-  }, 800)
+  // const persistLogs = debounce(async (appId: string) => {
+  //   await writeTextFile(`${appId}/app.log`, startLogs, {
+  //     dir: BaseDirectory.AppLocalData
+  //   })
+  // }, 800)
 
   const recordAndPersistLogs = (data: string) => {
     setStartLogs((prevLog => prevLog + data))

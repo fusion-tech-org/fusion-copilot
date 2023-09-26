@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Dropdown, Input, Layout, MenuProps } from 'antd';
 import { NoteListWrapper } from './styles';
 import { DeleteOutlined, EditOutlined, LeftCircleOutlined, MoreOutlined, PlusCircleOutlined, PushpinOutlined, SettingOutlined } from '@ant-design/icons';

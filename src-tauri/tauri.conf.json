@@ -170,7 +170,7 @@
         "installerArgs": []
       },
       "endpoints": [
-        "https://service-lxp3bh0o-1254102905.gz.apigw.tencentcs.com/release/info/{{target}}/{{current_version}}"
+        "https://service-lxp3bh0o-1254102905.gz.apigw.tencentcs.com/release/info/{{target}}/{{arch}}{{current_version}}"
       ]
     }
   }

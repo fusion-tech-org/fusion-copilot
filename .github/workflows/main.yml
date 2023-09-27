@@ -23,6 +23,12 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+      - name: setup sqlite3.lib (windows only)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/setup-sqlite@v1
+        with:
+          sqlite-version: 3.40.0
+          sqlite-year: 2022
       - name: install protoc
         uses: arduino/setup-protoc@v2
       - name: install Rust stable

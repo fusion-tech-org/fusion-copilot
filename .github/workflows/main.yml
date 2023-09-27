@@ -56,6 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
       - name: install sqlite3
         run: |
           choco install sqlite3

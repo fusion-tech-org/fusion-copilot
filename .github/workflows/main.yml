@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [macos-latest, ubuntu-20.04]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -23,21 +23,19 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: setup sqlite3.lib (windows only)
-        if: matrix.platform == 'windows-latest'
-        uses: actions/setup-sqlite@v1
-        with:
-          sqlite-version: 3.40.0
-          sqlite-year: 2022
       - name: install protoc
         uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+      # Needed because of: migrations_macros v1.4.2
+      # note: /usr/bin/ld: cannot find -lsqlite3
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libsqlite3-dev
       - name: install frontend dependencies
         run: pnpm install # change this to npm or pnpm depending on which one you use
       - uses: tauri-apps/tauri-action@v0
@@ -48,6 +46,52 @@ jobs:
         with:
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: 'v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: 'To create one awesome tools for ZiWei teams.'
+          releaseDraft: false
+          prerelease: false
+
+  publish-win:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+
+    runs-on: windows-latest
+    env:
+      SQLITE3_LIB_DIR: "C:\\sqlite"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ilammy/msvc-dev-cmd@v1
+      # - name: Set up MinGW
+      #   uses: egor-tensin/setup-mingw@v2
+      #   with:
+      #     platform: x64
+      - name: 'Install SQLite'
+        shell: cmd
+        run: .github/install-sqlite.bat
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: install protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+      - name: install frontend dependencies
+        run: pnpm install # change this to npm or pnpm depending on which one you use
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }} # secrets，需要提前配置在 Github Secrets中
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }} # 密钥的加密文本，与ssh-keygen时输入的密码一致即可。如果未输入密码，则此处留空，如果输入了密码，则也需要添加到 secrets 中，然后使用 ${{ secrets.TAURI_PRIVATE_KEY_PASSWORD }} 这种形式
+        with:
+          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          releaseName: 'v__VERSION__'
+          releaseBody: 'To create one awesome tools for ZiWei teams.'
           releaseDraft: false
           prerelease: false

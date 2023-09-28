@@ -1,6 +1,6 @@
 [package]
 name = "fusion_copilot"
-version = "0.1.0"
+version = "0.1.6"
 description = "A Tauri App"
 authors = ["fujia"]
 license = "MIT"
@@ -11,15 +11,23 @@ edition = "2021"
 name = "dialect"
 
 [[example]]
-name ="covid"
+name = "covid"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.4", features = [] }
-prost-build = "0.12" # compile protobuf
+prost-build = "0.12"                             # compile protobuf
 
 [dependencies]
-tauri = { version = "1.4", features = [ "updater", "system-tray", "http-all", "shell-open", "shell-execute", "path-all", "fs-all"] }
+tauri = { version = "1.4", features = [
+  "updater",
+  "system-tray",
+  "http-all",
+  "shell-open",
+  "shell-execute",
+  "path-all",
+  "fs-all",
+] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 zip = "0.6.6"
@@ -32,11 +40,14 @@ actix-files = "0.6.2"
 dirs = "5.0.1"
 diesel = { version = "2.1.1", features = ["sqlite"] }
 diesel_migrations = "2.1.0"
-thiserror = "1.0.48" 
+thiserror = "1.0.48"
 base64 = "0.21.3" # base64 encode/decode
 bytes = "1.5.0" # handle byte stream
 image = "0.24.7" # handle picture
 lazy_static = "1.4.0" # To initiate static variable more convenient via macro
+libsqlite3-sys = { version = ">=0.17.2, <0.26.0", features = [
+  "bundled_bindings",
+] } # to resove relevant issues about sqlite 
 lru = "0.11.1" # LRU cache
 percent-encoding = "2.3.0" # url encode/decode
 photon-rs = "0.3.2" # picture's effects
@@ -47,7 +58,7 @@ env_logger = "0.10.0"
 futures = "0.3.28"
 async-trait = "0.1.73" # allowing include `async fn` in trait
 # sqlparser = "0.37.0" # SQL parser
-sqlparser = "0.10.0" # SQL parser
+sqlparser = "0.10.0"                                       # SQL parser
 polars = { version = "0.15", features = ["json", "lazy"] } # DataFrame library
 
 

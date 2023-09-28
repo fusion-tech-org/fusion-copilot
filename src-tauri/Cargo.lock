@@ -1418,7 +1418,7 @@ dependencies = [
 
 [[package]]
 name = "fusion_copilot"
-version = "0.1.0"
+version = "0.1.6"
 dependencies = [
  "actix-files",
  "actix-web",
@@ -1433,6 +1433,7 @@ dependencies = [
  "futures",
  "image 0.24.7",
  "lazy_static",
+ "libsqlite3-sys",
  "lru",
  "mime",
  "percent-encoding",
@@ -2493,9 +2494,9 @@ dependencies = [
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.26.0"
+version = "0.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afc22eff61b133b115c6e8c74e818c628d6d5e7a502afea6f64dee076dd94326"
+checksum = "29f835d03d717946d28b1d1ed632eb6f0e24a299388ee623d0c23118d3e8a7fa"
 dependencies = [
  "pkg-config",
  "vcpkg",

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export const Sql = () => {
+export const SqlQuerier = () => {
   return (
     <div>
       image JS handler

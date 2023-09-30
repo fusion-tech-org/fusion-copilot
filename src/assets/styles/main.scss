@@ -4,3 +4,9 @@
 :root {
   --theme-primary: #1677ff;
 }
+
+// 禁止浏览器超出部分滚动的弹跳效果 forbidden exclude safari
+html,
+body {
+  overscroll-behavior-y: none;
+}

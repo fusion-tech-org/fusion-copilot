@@ -6,11 +6,6 @@ import { Link } from 'react-router-dom';
 import { MyLink } from 'components/common-styles';
 import { LeftCircleOutlined } from '@ant-design/icons';
 
-// type FieldType = {
-//   title?: string;
-//   body?: string;
-// };
-
 export const ToolKitPage = () => {
   // const formRef = useRef<FormInstance<FieldType>>(null);
   // const handleFinish = async () => {
@@ -30,6 +25,11 @@ export const ToolKitPage = () => {
   // };
 
   const data = [
+    {
+      title: '文件传输',
+      description: '基于WebRTC的超大文件传输',
+      url: '/toolkit/file-sender',
+    },
     {
       title: '图片处理器(Rust版)',
       description: '多功能图片处理',
@@ -84,3 +84,11 @@ export const ToolKitPage = () => {
     </div>
   );
 };
+
+export { FileSender } from './FileSender'
+export { ImageHandler } from './ImageHandler';
+export { ImageJSHandler } from './ImageJSHandler';
+export { SqlQuerier } from './SqlQuerier';
+export { StaticServer } from './StaticServer';
+
+

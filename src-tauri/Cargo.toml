@@ -1,6 +1,6 @@
 [package]
 name = "fusion_copilot"
-version = "0.1.6"
+version = "0.1.7"
 description = "A Tauri App"
 authors = ["fujia"]
 license = "MIT"
@@ -46,7 +46,7 @@ bytes = "1.5.0" # handle byte stream
 image = "0.24.7" # handle picture
 lazy_static = "1.4.0" # To initiate static variable more convenient via macro
 libsqlite3-sys = { version = ">=0.17.2, <0.26.0", features = [
-  "bundled_bindings",
+  "bundled",
 ] } # to resove relevant issues about sqlite 
 lru = "0.11.1" # LRU cache
 percent-encoding = "2.3.0" # url encode/decode

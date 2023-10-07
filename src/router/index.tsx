@@ -5,12 +5,15 @@ import { DeveloperPage } from 'pages/Developer';
 import { PageAppDetail } from 'pages/Developer/PageAppDetail';
 import { PageDataJson } from 'pages/Developer/PageDataJson';
 import { PageDevSetting } from 'pages/Developer/PageDevSetting';
-import { ToolKitPage } from 'pages/Toolkit';
-import { ImageHandler } from 'pages/Toolkit/ImageHandler';
-import { StaticServer } from 'pages/Toolkit/StaticServer';
+import {
+  ToolKitPage,
+  ImageHandler,
+  StaticServer,
+  FileSender,
+  ImageJSHandler,
+} from 'pages/Toolkit';
 import { NotesPage } from 'pages/Notes';
 import { WhiteboardPage } from 'pages/Whiteboard';
-import { ImageJSHandler } from 'pages/Toolkit/ImageJSHandler';
 import { PageDataJsonExport } from 'pages/Developer/PageDataJsonExport';
 import { PageToolManage } from 'pages/Developer/PageToolManage';
 import { PageMigrateApp } from 'pages/Developer/PageMigrateApp';
@@ -66,4 +69,5 @@ export const rootRouter = createBrowserRouter([
   { path: '/toolkit/image-handler', element: <ImageHandler /> },
   { path: '/toolkit/image-js-handler', element: <ImageJSHandler /> },
   { path: '/toolkit/static-server', element: <StaticServer /> },
+  { path: '/toolkit/file-sender', element: <FileSender /> },
 ]);

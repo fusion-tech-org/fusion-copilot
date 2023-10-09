@@ -1,35 +1,35 @@
-import { Button, Modal, Upload } from "antd";
-import { Link } from "react-router-dom";
-import { Peer, DataConnection } from 'peerjs';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { BaseDirectory, readBinaryFile } from '@tauri-apps/api/fs';
-import { ReceiverClient } from "./ReceiverClient";
+import { Button, Modal, Upload } from 'antd';
+import { Peer, DataConnection } from 'peerjs';
+import { Link } from 'react-router-dom';
+import { ReceiverClient } from './ReceiverClient';
 
 export const FileSender = () => {
   const [visible, setVisible] = useState(false);
   // let peer: Peer;
   let conn: DataConnection;
   // let readStream: Read
-  let sendFinished = false;
+  const sendFinished = false;
 
   const example = async () => {
     const contents = await readBinaryFile('sdfsf', {
-      dir: BaseDirectory.AppLocalData
+      dir: BaseDirectory.AppLocalData,
     });
 
-    contents.entries
-  }
+    contents.entries;
+  };
 
   const sendData = (data: string) => {
     const parsedData: {
-      msgName: 'chunkReady' | 'readyToReceiveFile'
+      msgName: 'chunkReady' | 'readyToReceiveFile';
     } = JSON.parse(data);
 
     if (parsedData.msgName === 'chunkReady') {
       if (sendFinished) {
         const msg = {
           msgName: 'fileSendFinish',
-          sendTime: Date.now()
+          sendTime: Date.now(),
         };
 
         conn.send(JSON.stringify(msg));
@@ -39,12 +39,11 @@ export const FileSender = () => {
     } else if (parsedData.msgName === 'readyToReceiveFile') {
       const msg = {
         msgName: 'sendChunk',
-        sendTime: Date.now()
+        sendTime: Date.now(),
       };
 
       conn.send(JSON.stringify(msg));
     }
-
   };
 
   const sendFile = () => {
@@ -52,7 +51,7 @@ export const FileSender = () => {
       host: '192.168.31.102',
       port: 9418,
       path: '/webrtc',
-      debug: 3
+      debug: 3,
     });
 
     const conn = sendPeer.connect('fileReceiver');
@@ -68,17 +67,15 @@ export const FileSender = () => {
     });
 
     conn.on('data', (data: any) => sendData(data));
-  }
+  };
 
   const handleSendFile = () => {
     sendFile();
 
-    setVisible(true)
-  }
+    setVisible(true);
+  };
 
-  useEffect(() => {
-
-  }, []);
+  useEffect(() => {}, []);
   return (
     <div>
       <div>
@@ -88,9 +85,7 @@ export const FileSender = () => {
         <Button onClick={handleSendFile}>send</Button>
         <Link to="/toolkit">Back</Link>
       </div>
-      <Modal open={visible} destroyOnClose>
-        <ReceiverClient />
-      </Modal>
+      <ReceiverClient />
     </div>
-  )
+  );
 };

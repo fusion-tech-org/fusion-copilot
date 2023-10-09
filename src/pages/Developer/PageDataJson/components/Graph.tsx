@@ -50,6 +50,7 @@ const CanvasGraph = ({
 
   const memoizedNode = useCallback(
     (props: JSX.IntrinsicAttributes & NodeProps) => (
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       <CustomNode {...props} onClick={handleNodeClick} animated={false} />
     ),
@@ -78,6 +79,8 @@ const CanvasGraph = ({
     },
     [setLoading, validateHiddenNodes, layoutChangeFn]
   );
+
+  console.log(nodes)
 
   return (
     <Canvas

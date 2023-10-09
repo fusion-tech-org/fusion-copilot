@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, notification } from 'antd';
 import { Peer, DataConnection } from 'peerjs';
 import { useEffect } from 'react';
 
@@ -23,7 +23,11 @@ export const ReceiverClient = () => {
 
         if (parsedData.msgName === 'beginSendFile') {
           console.log('received send file request <-');
-
+          notification.info({
+            message: 'receiving send file request',
+            placement: 'bottomRight',
+            duration: 5000
+          })
         } else if (parsedData.msgName === 'fileSendFileFinish') {
           console.log('sending file finished');
         } else if (parsedData.msgName === 'sendChunk') {

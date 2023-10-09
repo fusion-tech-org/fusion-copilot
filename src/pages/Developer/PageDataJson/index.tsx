@@ -5,6 +5,7 @@ import { exists, BaseDirectory, readTextFile } from '@tauri-apps/api/fs';
 import { appLocalDataDir, resolve } from '@tauri-apps/api/path';
 // import { useInternal } from 'store/useInternal';
 import { Graph } from './components/Graph';
+import { SEP } from 'constants/index'
 
 const LOWCODE_APP_JAR_NAME = 'lowcode-app';
 
@@ -20,17 +21,18 @@ export const PageDataJson = () => {
 
     const appLocalDataDirPath = await appLocalDataDir();
     // first step: check `lowcode-app.jar` whether unzipped.
-    const isLowcodeDirExisted = await exists(`${aid}/${LOWCODE_APP_JAR_NAME}`, {
+    const isLowcodeDirExisted = await exists(`${aid}${SEP}${LOWCODE_APP_JAR_NAME}`, {
       dir: BaseDirectory.AppLocalData
     });
     console.log(isLowcodeDirExisted, aid);
 
     if (isLowcodeDirExisted) {
-      const jsonPath = await resolve(appLocalDataDirPath, aid, LOWCODE_APP_JAR_NAME, 'BOOT-INF/classes/data/data.json');
+      const jsonPath = await resolve(appLocalDataDirPath, aid, LOWCODE_APP_JAR_NAME, `BOOT-INF${SEP}classes${SEP}data${SEP}data.json`);
       console.log(jsonPath);
-      const dataJson = await readTextFile(`${aid}/${LOWCODE_APP_JAR_NAME}/BOOT-INF/classes/data/data.json`, {
+      const dataJson = await readTextFile(`${aid}${SEP}${LOWCODE_APP_JAR_NAME}${SEP}BOOT-INF${SEP}classes${SEP}data${SEP}data.json`, {
         dir: BaseDirectory.AppLocalData
-      })
+      });
+
       setPendingDataJson(dataJson);
       // setGraph(dataJson);
     }

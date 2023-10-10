@@ -75,7 +75,8 @@ export const FileSender = () => {
     setVisible(true);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
+
   return (
     <div>
       <div>

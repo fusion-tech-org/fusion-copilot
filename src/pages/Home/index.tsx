@@ -1,6 +1,7 @@
 import { Space, Card } from 'antd';
 import { BugOutlined, LinkOutlined, ReadOutlined, ToolOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { Icon } from 'components/index';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -9,7 +10,11 @@ export const HomePage = () => {
   };
 
   return (
-    <section className="flex items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen">
+      <Icon iconName='logo' svgStyle={{
+        width: 72,
+        height: 72
+      }} />
       <Space className="w-3/5 h-3/5 justify-center" size={32} wrap>
         <Card style={{ width: 200 }}>
           <BugOutlined
@@ -61,8 +66,7 @@ export const HomePage = () => {
             白板
           </p>
         </Card>
-
       </Space>
-    </section>
+    </div>
   );
 };

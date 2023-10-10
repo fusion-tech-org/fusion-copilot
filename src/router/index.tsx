@@ -4,7 +4,7 @@ import { HomePage } from 'pages/Home';
 import { DeveloperPage } from 'pages/Developer';
 import { PageAppDetail } from 'pages/Developer/PageAppDetail';
 import { PageDataJson } from 'pages/Developer/PageDataJson';
-import { PageDevSetting } from 'pages/Developer/PageDevSetting';
+import { PageDevSetting } from 'pages/Developer/PageDevSetting/index';
 import {
   ToolKitPage,
   ImageHandler,

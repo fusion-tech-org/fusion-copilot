@@ -1,25 +1,8 @@
 use crate::local_db::establish_connection;
 use crate::local_db::models::{NewNote, NewZiWeiApp, ZiWeiApp};
-use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{insert_into, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl};
 
 use fusion_copilot::schema::ziwei_apps::dsl::*;
-
-// create the error type that represents all errors possible in our program
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-  #[error(transparent)]
-  Io(#[from] std::io::Error),
-}
-
-// we must manually implement serde::Serialize
-impl serde::Serialize for Error {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where
-    S: serde::Serializer,
-  {
-    serializer.serialize_str(self.to_string().as_ref())
-  }
-}
 
 #[tauri::command]
 pub fn create_ziwei_app(
@@ -44,7 +27,7 @@ pub fn create_ziwei_app(
 }
 
 #[tauri::command]
-pub fn query_ziwei_apps() -> Result<Vec<ZiWeiApp>, Error> {
+pub fn query_ziwei_apps() -> Result<Vec<ZiWeiApp>, super::Error> {
   let conn = &mut establish_connection();
 
   let results = ziwei_apps

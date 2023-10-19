@@ -4,13 +4,16 @@
 
 use tauri::Manager;
 
-use front_commands::action_opts::{
-  create_ziwei_app, del_app_by_id, get_app_by_id, query_ziwei_apps, toggle_app_running_status,
-  toggle_app_zip_status,
-};
-use front_commands::file_opts::{get_resource_file, greet, unzip_file};
-use front_commands::sys_opts::{
-  check_port_is_available, close_splashscreen, get_available_port_list, run_local_server,
+use front_commands::{
+  action_opts::{
+    create_ziwei_app, del_app_by_id, get_app_by_id, query_ziwei_apps, toggle_app_running_status,
+    toggle_app_zip_status,
+  },
+  config_opts::{create_env_config, query_env_configs},
+  file_opts::{get_resource_file, greet, unzip_file},
+  sys_opts::{
+    check_port_is_available, close_splashscreen, get_available_port_list, run_local_server,
+  },
 };
 
 use std::sync::Mutex;
@@ -77,7 +80,9 @@ fn main() {
       toggle_app_running_status,
       toggle_app_zip_status,
       get_app_by_id,
-      del_app_by_id
+      del_app_by_id,
+      query_env_configs,
+      create_env_config
     ])
     .system_tray(custom_tray)
     .on_system_tray_event(|app, event| handle_sys_tray_event(app, event))

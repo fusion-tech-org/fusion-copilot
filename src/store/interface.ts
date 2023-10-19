@@ -80,3 +80,10 @@ export interface InternalActions {
   getCollapsedEdgeIds: () => string[];
 }
 
+export interface EnvConfigItem {
+  id: number;
+  env_name: string;
+  env_value: string;
+  env_desc?: string;
+  created_at: string;
+}

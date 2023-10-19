@@ -59,3 +59,17 @@ export const AppDetailLogWrapper = styled.div`
   color: #fff;
   line-height: 1.8;
 `;
+
+export const SettingContainer = styled.div`
+  padding: 16px 24px;
+`;
+
+export const EnvSettingContainer = styled.div`
+  .ant-collapse-header:hover {
+    .show-edit {
+      display: block;
+      transition: all 0.3s;
+      color: var(--theme-primary)
+    }
+  } 
+`;

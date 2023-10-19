@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BaseDirectory, createDir, exists } from '@tauri-apps/api/fs';
 import { RouterProvider } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
 
 import { rootRouter } from './router';
 import { message } from 'antd';
@@ -28,9 +29,10 @@ function App() {
   }, []);
 
   return (
-    <section>
+    <ConfigProvider theme={{ token: { colorPrimary: '#4096ff' } }}>
+      {/* <ConfigProvider theme={{ token: { colorPrimary: '#00b96b' } }}> */}
       <RouterProvider router={rootRouter} />
-    </section>
+    </ConfigProvider >
   );
 }
 

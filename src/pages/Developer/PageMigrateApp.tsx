@@ -1,14 +1,16 @@
-import { Select, Input, Space, Button, Form, Divider, notification } from "antd";
+import { Select, Input, Space, Button, Form, Divider, notification, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
-import { envOptions } from "./PageDataJsonExport";
 import { ZiWeiResponse, checkValidResponseForZiWei } from "utils/index";
+import { useDeveloperStore } from "store/useDeveloper";
+import { useMemo } from "react";
 
 const FormItem = Form.Item;
 
 export const PageMigrateApp = () => {
   const navigate = useNavigate();
+  const { envConfigList } = useDeveloperStore();
   const [form] = Form.useForm<{
     sourceBaseUrl: string;
     sourceAppId: string;
@@ -16,6 +18,13 @@ export const PageMigrateApp = () => {
     targetUsername: string;
     targetAppName: string;
   }>();
+
+  const envOptions = useMemo(() => {
+    return envConfigList.map(config => ({
+      label: config.env_name,
+      value: config.env_value
+    }));
+  }, [JSON.stringify(envConfigList)])
 
   const handleConfirm = async () => {
     try {
@@ -36,13 +45,6 @@ export const PageMigrateApp = () => {
       * 
       * STEP2. On the basis of the data.json to create new app in target environment
       */
-
-      console.log(sourceBaseUrl,
-        sourceAppId,
-        targetBaseUrl,
-        targetUsername,
-        targetAppName);
-
       const resData = await axios.get(`${sourceBaseUrl}/api/v1/temps/export/${sourceAppId}`);
 
       const jsonBlob = new Blob([JSON.stringify(resData.data)], {
@@ -76,8 +78,9 @@ export const PageMigrateApp = () => {
     }
   };
 
-  return <div className="w-[480px] mt-6">
-    <Form form={form} labelCol={{
+  return <div className="w-[520px]">
+    {envOptions?.length === 0 && <Alert className="mt-3 text-xs" message="当前环境列表为空，请在「开发者」页下「我的设置」中新增环境值" type="info" />}
+    <Form form={form} className="mt-6" labelCol={{
       span: 5
     }}>
       <div className="mb-4 font-semibold">导出应用：</div>

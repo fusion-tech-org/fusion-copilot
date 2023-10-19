@@ -150,7 +150,8 @@
         "width": 1024,
         "height": 768,
         "hiddenTitle": true,
-        "visible": true
+        "visible": true,
+        "title": "Fusion Copilot"
       },
       {
         "width": 1024,

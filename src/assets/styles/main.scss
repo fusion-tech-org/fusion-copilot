@@ -1,11 +1,11 @@
-@import 'antd/dist/reset.css';
 @import './tailwind.css';
+@import 'antd/dist/reset.css';
 
 :root {
   --theme-primary: #1677ff;
 }
 
-// 禁止浏览器超出部分滚动的弹跳效果 forbidden exclude safari
+/* 禁止浏览器超出部分滚动的弹跳效果 forbidden exclude safari */
 html,
 body {
   overscroll-behavior-y: none;

@@ -111,17 +111,13 @@ export const PageAppDetail = () => {
       setStartingApp(true);
       const targetDir = await appLocalDataDir();
       const pendingAppPath = await resolve(targetDir, appId, 'lowcode-app.jar');
-      const logPath = await resolve(targetDir, appId, 'appLog');
+      // const logPath = await resolve(targetDir, appId, 'appLog');
 
       const cmd = new Command('run-start-app', [
         '-jar',
         pendingAppPath,
         '--spring.profiles.active=test',
         '--filter.enable=false',
-        '>>',
-        logPath,
-        '2>&1',
-        '&',
       ]);
 
       cmd.on('close', (data) => {

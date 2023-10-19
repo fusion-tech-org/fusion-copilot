@@ -4,7 +4,7 @@ import { HomePage } from 'pages/Home';
 import { DeveloperPage } from 'pages/Developer';
 import { PageAppDetail } from 'pages/Developer/PageAppDetail';
 import { PageDataJson } from 'pages/Developer/PageDataJson';
-import { PageDevSetting } from 'pages/Developer/PageDevSetting';
+import { PageDevSetting } from 'pages/Developer/PageDevSetting/index';
 import {
   ToolKitPage,
   ImageHandler,
@@ -17,6 +17,7 @@ import { WhiteboardPage } from 'pages/Whiteboard';
 import { PageDataJsonExport } from 'pages/Developer/PageDataJsonExport';
 import { PageToolManage } from 'pages/Developer/PageToolManage';
 import { PageMigrateApp } from 'pages/Developer/PageMigrateApp';
+import { QuadrantTime } from 'pages/QuadrantTime';
 
 export const rootRouter = createBrowserRouter([
   {
@@ -70,4 +71,7 @@ export const rootRouter = createBrowserRouter([
   { path: '/toolkit/image-js-handler', element: <ImageJSHandler /> },
   { path: '/toolkit/static-server', element: <StaticServer /> },
   { path: '/toolkit/file-sender', element: <FileSender /> },
+  {
+    path: '/quadrant-time', element: <QuadrantTime />
+  }
 ]);

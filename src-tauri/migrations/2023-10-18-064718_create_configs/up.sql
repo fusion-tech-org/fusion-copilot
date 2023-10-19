@@ -1,0 +1,8 @@
+-- Your SQL goes here
+CREATE TABLE env_configs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  env_name VARCHAR NOT NULL,
+  env_value VARCHAR NOT NULL,
+  env_desc VARCHAR,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+)

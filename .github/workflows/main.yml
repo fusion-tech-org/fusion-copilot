@@ -92,6 +92,6 @@ jobs:
         with:
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: 'v__VERSION__'
-          releaseBody: 'To create one awesome tools for ZiWei teams.'
+          releaseBody: 'To finish basic functions of env config pages'
           releaseDraft: false
           prerelease: false

@@ -12,7 +12,6 @@ interface IProps {
 export default function SvgIcon(props: IProps) {
   const { iconName, wrapperStyle, svgStyle } = props;
   const { loading, Icon } = useDynamicSvgImport(iconName);
-  console.log(Icon);
 
   return (
     <>

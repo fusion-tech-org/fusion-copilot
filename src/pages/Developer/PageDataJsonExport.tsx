@@ -1,24 +1,11 @@
-import { Button, Form, Input, Select, Space, notification } from "antd";
+import { Alert, Button, Form, Input, Select, Space, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
 import axios from 'axios';
+import { useDeveloperStore } from "store/useDeveloper";
+import { useMemo } from "react";
 
 const FormItem = Form.Item;
-
-export const envOptions = [
-  {
-    label: '测试',
-    value: 'http://10.10.31.26:9200',
-  },
-  {
-    label: '预发',
-    value: 'https://staging.fusiontech.cn',
-  },
-  {
-    label: '正式',
-    value: 'https://app.fusiontech.cn',
-  }
-];
 
 const targetDirOptions = [
   {
@@ -39,11 +26,19 @@ type AvailableDownloadNames = 'download' | 'desktop' | 'appData';
 
 export const PageDataJsonExport = () => {
   const navigate = useNavigate();
+  const { envConfigList } = useDeveloperStore();
   const [form] = Form.useForm<{
     baseUrl: string;
     appId: string;
     targetDir: AvailableDownloadNames;
   }>();
+
+  const envOptions = useMemo(() => {
+    return envConfigList.map(config => ({
+      label: config.env_name,
+      value: config.env_value
+    }));
+  }, [JSON.stringify(envConfigList)])
 
   const handleConfirm = async () => {
     try {
@@ -74,8 +69,9 @@ export const PageDataJsonExport = () => {
     }
   }
 
-  return <div className="w-[360px] mt-12">
-    <Form form={form} labelCol={{
+  return <div className="w-[520px]">
+    {envOptions?.length === 0 && <Alert className="mt-3 text-xs" message="当前环境列表为空，请在「开发者」页下「我的设置」中新增环境值" type="info" />}
+    <Form form={form} className="mt-6" labelCol={{
       span: 5
     }}>
       <FormItem label="环境" name="baseUrl" rules={[{ required: true, message: '环境参数不能为空' }]}>

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 export type AppState = {
+  online: boolean;
   isLocalServerRunning: boolean;
 };
 
@@ -11,6 +12,7 @@ export type AppAction = {
 };
 
 export const useStore = create<AppState & AppAction>((set) => ({
+  online: true,
   isLocalServerRunning: false,
   updateLocalServerStatus: (serverStatus) =>
     set(() => ({

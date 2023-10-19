@@ -7,5 +7,6 @@ CREATE TABLE ziwei_apps (
   local_path VARCHAR NOT NULL,
   unzipped BOOLEAN NOT NULL DEFAULT false,
   is_running BOOLEAN NOT NULL DEFAULT false,
+  tags VARCHAR,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 )

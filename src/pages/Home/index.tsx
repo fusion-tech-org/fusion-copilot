@@ -23,7 +23,7 @@ export const HomePage = () => {
             }}
           />
           <p
-            className="text-md mt-2 cursor-pointer"
+            className="text-lg mt-2 cursor-pointer"
             onClick={handleLink('/developer')}
           >
             开发者
@@ -36,7 +36,7 @@ export const HomePage = () => {
             }}
           />
           <p
-            className="text-md mt-2 cursor-pointer"
+            className="text-lg mt-2 cursor-pointer"
             onClick={handleLink('/toolkit')}
           >
             工具箱
@@ -49,7 +49,7 @@ export const HomePage = () => {
             }}
           />
           <p
-            className="text-md mt-2 cursor-pointer"
+            className="text-lg mt-2 cursor-pointer"
             onClick={handleLink('/notes')}
           >
             备忘录
@@ -60,7 +60,7 @@ export const HomePage = () => {
             fontSize: 32,
           }} />
           <p
-            className="text-md mt-2 cursor-pointer"
+            className="text-lg mt-2 cursor-pointer"
             onClick={handleLink('/whiteboard')}
           >
             白板
@@ -71,7 +71,7 @@ export const HomePage = () => {
             fontSize: 32,
           }} />
           <p
-            className="text-md mt-2 cursor-pointer"
+            className="text-lg mt-2 cursor-pointer"
             onClick={handleLink('/quadrant-time')}
           >
             任务管理

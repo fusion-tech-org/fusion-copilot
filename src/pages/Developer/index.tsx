@@ -23,6 +23,8 @@ import { getAppNameFromPath, stopApp } from 'utils/index';
 import { DeploymentManage } from './components/DeploymentManage';
 import { ToolManage } from './components/ToolManage';
 import { LocalAppItem, RemoteAppItem } from './interface';
+import { EnvConfigItem } from 'store/interface';
+import { useDeveloperStore } from 'store/useDeveloper';
 
 const VALID_PACKAGE_PREFIX = '紫薇';
 
@@ -40,7 +42,7 @@ const { confirm } = Modal;
 export const DeveloperPage = () => {
   const [availableApps, setAvailableApps] = useState<RemoteAppItem[]>([]);
   const [activeTabItem, setActiveTabItem] = useState<TabsItems>('deployment_manage');
-
+  const { setEnvConfigList } = useDeveloperStore();
   const onChange = (key: string) => {
     setActiveTabItem(key as TabsItems);
   };
@@ -249,11 +251,25 @@ export const DeveloperPage = () => {
     });
   };
 
+  const queryEnvConfigs = async () => {
+    try {
+      const res: EnvConfigItem[] = await invoke('query_env_configs');
+
+      if (res?.length > 0) {
+        setEnvConfigList(res);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   useEffect(() => {
     /**
      * NOTE: Comparing apps of local directory with sqlite's storing apps
      */
     compareLocalAppToRemote();
+
+    queryEnvConfigs();
   }, []);
 
   const items: TabsProps['items'] = [

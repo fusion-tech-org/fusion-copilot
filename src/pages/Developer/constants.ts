@@ -23,13 +23,13 @@ export const ActionList: Readonly<
     // },
     {
       id: 3,
-      label: '停止',
+      label: '关闭应用',
       value: 'stop',
       actionStatus: 'default',
     },
     {
       id: 4,
-      label: '删除',
+      label: '删除应用',
       value: 'delete',
       actionStatus: 'default'
     },

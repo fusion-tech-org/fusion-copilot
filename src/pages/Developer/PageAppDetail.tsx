@@ -18,7 +18,7 @@ import {
 import { MyLink } from 'components/index';
 import { ActionValue, RemoteAppItem } from './interface';
 import { ActionList, OPEN_IP_LIST, DEFAULT_APP_PORT } from './constants';
-import { stopApp, stopLowcodeApp } from 'utils/index';
+import { stopApp, stopLowCodeApp } from 'utils/index';
 import { SQL_CREATE_SUCCESS } from 'constants/index';
 
 const DescriptionItem = Descriptions.Item;
@@ -35,9 +35,21 @@ export const PageAppDetail = () => {
   }>();
   const appKey = toNumber(id);
   const [startingApp, setStartingApp] = useState(false);
-  const [enableAuth, setEnableAuth] = useState(false);
+  const [enableChrome, setEnableChrome] = useState(true);
+  const [actionLoading, setActionLoading] = useState<{
+    unzip: boolean;
+    startup: boolean;
+    stop: boolean;
+    delete: boolean;
+  }>({
+    unzip: false,
+    startup: false,
+    stop: false,
+    delete: false,
+  });
   const [appPort, setAppPort] = useState(DEFAULT_APP_PORT);
   const [appUrls, setAppUrls] = useState<string[]>([]);
+
   // const [startLogs, setStartLogs] = useState('');
 
   // const getAppDir = async () => {
@@ -89,6 +101,10 @@ export const PageAppDetail = () => {
 
   const handleUnzipPackage = async (sourceFilePath: string) => {
     try {
+      setActionLoading(preState => ({
+        ...preState,
+        unzip: true,
+      }));
       const targetDir = await appLocalDataDir();
 
       const msg: boolean = await invoke('unzip_file', {
@@ -101,6 +117,11 @@ export const PageAppDetail = () => {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setActionLoading(preState => ({
+        ...preState,
+        unzip: false,
+      }));
     }
   };
 
@@ -137,7 +158,7 @@ export const PageAppDetail = () => {
     try {
       const localIp: string = await invoke('query_local_ip');
 
-      if (!!localIp) return localIp;
+      if (!isEmpty(localIp)) return localIp;
 
     } catch (e) {
       console.log(e);
@@ -160,6 +181,10 @@ export const PageAppDetail = () => {
   const handleStartApp = async (appId: string) => {
     try {
       setStartingApp(true);
+      setActionLoading(preState => ({
+        ...preState,
+        startup: true,
+      }));
       await checkPortValid();
       await genOpenUrls();
       const targetDir = await appLocalDataDir();
@@ -227,20 +252,38 @@ export const PageAppDetail = () => {
     } catch (e) {
       setStartingApp(false);
       console.log('Starting up the app failed', e);
+    } finally {
+      setActionLoading(preState => ({
+        ...preState,
+        startup: false,
+      }));
     }
 
   };
 
   const handleStopApp = async () => {
-    setStartingApp(false);
-
-    await stopLowcodeApp(appPort);
-
-    // const isSuccess = await stopApp();
-
-    // if (isSuccess) {
-    //   handleToggleAppRunStatus(false);
-    // }
+    try {
+      setActionLoading(preState => ({
+        ...preState,
+        stop: true
+      }));
+      setStartingApp(false);
+      
+      const killProcessRes =  await stopLowCodeApp(appPort);
+      console.log(killProcessRes);
+      // const isSuccess = await stopApp();
+  
+      if (killProcessRes) {
+        handleToggleAppRunStatus(false);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setActionLoading(preState => ({
+        ...preState,
+        stop: false
+      }));
+    }
   };
 
   const ACTION_MAP_INVOKE: Record<
@@ -310,7 +353,7 @@ export const PageAppDetail = () => {
       const parsedAppDetail: RemoteAppItem = JSON.parse(appStr);
 
       const { app_name } = parsedAppDetail;
-
+      console.log(parsedAppDetail);
       setAppName(app_name);
       setAppDetail(parsedAppDetail);
     } catch (e) {
@@ -320,6 +363,11 @@ export const PageAppDetail = () => {
 
   const handleOpenUrl = (url: string) => async () => {
     console.log(url);
+    const openParams = [url];
+    if (enableChrome) {
+      openParams.push("firefox")
+    }
+    console.log(openParams.join(','));
     await open(url);
   }
 
@@ -336,7 +384,7 @@ export const PageAppDetail = () => {
     is_running = false,
   } = (appDetail || {}) as RemoteAppItem;
   const isDisableAction = isEmpty(appDetail);
-
+console.log(isDisableAction, 'isDisa');
   return (
     <AppDetailContainer>
       <div>
@@ -378,20 +426,22 @@ export const PageAppDetail = () => {
               disabled={isDisableAction || unzipped
               }
               type="primary"
+              loading={actionLoading.unzip}
               onClick={handleAppAction('unzip')}>
-              解压
+              {actionLoading.unzip ? '解压中...' : '解压'}
             </Button>
           </DescriptionItem>
           <DescriptionItem label="启动操作" key="startup-action" span={3}>
             <div className="flex items-center">
               <Button key="startup"
                 size="small"
-                disabled={isDisableAction || is_running || startingApp || !unzipped
+                disabled={isDisableAction || is_running || !unzipped 
                 }
                 type="primary"
                 className="mr-12"
+                loading={actionLoading.startup}
                 onClick={handleAppAction('startup')}>
-                启动
+                { actionLoading.startup ? '启动中...' : '启动应用'}
               </Button>
               <Form form={form} layout="inline" size="small">
                 <FormItem name="auth">
@@ -427,16 +477,17 @@ export const PageAppDetail = () => {
                   )
                   )
                 }
+                {/* <div className="text-xs ml-3"><Checkbox checked={enableChrome} onChange={e => setEnableChrome(e.target.value)}>使用Chrome打开</Checkbox></div> */}
               </Space>
             </DescriptionItem>
           }
           <DescriptionItem label="更新操作" key="startup-action" span={3}>
             <Space size={24}>
-              <Button type="default" size="small">更新Data.json</Button>
+              <Button type="default" size="small" disabled={!unzipped}>更新Data.json</Button>
               <Divider type="vertical" />
-              <Button type="default" size="small">更新客户端</Button>
+              <Button type="default" size="small" disabled={!unzipped}>更新客户端</Button>
               <Divider type="vertical" />
-              <Button type="default" size="small">更新服务端</Button>
+              <Button type="default" size="small" disabled={!unzipped}>更新服务端</Button>
             </Space>
           </DescriptionItem>
           <DescriptionItem label="其它操作" key="action" span={3}>{
@@ -449,9 +500,10 @@ export const PageAppDetail = () => {
                     || (value === 'stop' && !is_running)
                   }
                   type={actionStatus}
+                  loading={value === 'stop' && actionLoading.stop}
                   danger={value === 'delete'}
                   onClick={handleAppAction(value)}>
-                  {label}
+                  { value === 'stop' && actionLoading.stop ? '关闭应用中...' : label}
                 </Button>
               ))}
             </Space>

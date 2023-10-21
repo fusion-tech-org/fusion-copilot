@@ -38,8 +38,8 @@
             "args": true
           },
           {
-            "name": "run-bat-file",
-            "cmd": "cmd",
+            "name": "run-ps",
+            "cmd": "powershell",
             "args": true
           },
           {
@@ -55,6 +55,11 @@
           {
             "name": "run-git",
             "cmd": "git",
+            "args": true
+          },
+          {
+            "name": "run-netstat",
+            "cmd": "netstat",
             "args": true
           }
         ]

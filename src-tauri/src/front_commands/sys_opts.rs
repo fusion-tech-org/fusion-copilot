@@ -105,6 +105,7 @@ pub fn get_process_by_port_for_unix(port: usize) -> Result<Vec<UnixProcessInfo>,
     .unwrap();
 
   let shell_output = String::from_utf8(output.stdout).unwrap();
+
   // splitting by separator
   let info_vec: Vec<&str> = shell_output.split("\n").collect();
   let mut result: Vec<UnixProcessInfo> = vec![];
@@ -136,14 +137,10 @@ pub fn get_process_by_port_for_unix(port: usize) -> Result<Vec<UnixProcessInfo>,
 
 #[tauri::command]
 pub fn get_process_by_port_for_win(port: usize) -> Result<Vec<WinProcessInfo>, String> {
-  let output = Command::new("netstat")
-    .arg("-nao|findstr")
-    .arg(format!("{}", port))
-    .output()
-    .unwrap();
+  let output = Command::new("netstat").arg("-nao").output().unwrap();
 
   let shell_output = String::from_utf8(output.stdout).unwrap();
-
+  println!("{}", shell_output);
   let info_vec: Vec<&str> = shell_output.split("\r\n").collect();
 
   let mut result: Vec<WinProcessInfo> = vec![];

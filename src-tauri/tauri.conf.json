@@ -53,15 +53,9 @@
             "args": true
           },
           {
-            "name": "run-git-commit",
+            "name": "run-git",
             "cmd": "git",
-            "args": [
-              "commit",
-              "-m",
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "args": true
           }
         ]
       },

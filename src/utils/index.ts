@@ -1,5 +1,6 @@
 import { resolveResource } from "@tauri-apps/api/path";
 import { Command } from "@tauri-apps/api/shell";
+import { invoke } from '@tauri-apps/api';
 import { get } from "lodash";
 import { platform, Platform } from '@tauri-apps/api/os';
 
@@ -16,6 +17,22 @@ export const isWin32 = async () => await isSpecialPlatform('win32');
 export const isMac = async () => await isSpecialPlatform('darwin');
 
 export const isLinux = async () => await isSpecialPlatform('linux');
+
+export const stopLowcodeApp = async (appPort: number) => {
+  const isWinSys = await isWin32();
+  let res: Record<string, any> = {};
+  if (isWinSys) {
+    res = await invoke('get_process_by_port_for_win', {
+      port: appPort,
+    })
+  } else {
+    res = await invoke('get_process_by_port_for_unix', {
+      port: appPort
+    })
+  }
+
+  console.log(res);
+};
 
 export const stopApp = async (port?: number) => {
   try {

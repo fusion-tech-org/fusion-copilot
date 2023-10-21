@@ -19,7 +19,7 @@ tauri-build = { version = "1.4", features = [] }
 prost-build = "0.12"                             # compile protobuf
 
 [dependencies]
-tauri = { version = "1.4", features = [
+tauri = { version = "1.4", features = [ "os-all",
   "updater",
   "system-tray",
   "http-all",

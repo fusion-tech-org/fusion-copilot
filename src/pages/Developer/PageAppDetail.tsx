@@ -18,7 +18,7 @@ import {
 import { MyLink } from 'components/index';
 import { ActionValue, RemoteAppItem } from './interface';
 import { ActionList, OPEN_IP_LIST, DEFAULT_APP_PORT } from './constants';
-import { stopApp } from 'utils/index';
+import { stopApp, stopLowcodeApp } from 'utils/index';
 import { SQL_CREATE_SUCCESS } from 'constants/index';
 
 const DescriptionItem = Descriptions.Item;
@@ -234,11 +234,13 @@ export const PageAppDetail = () => {
   const handleStopApp = async () => {
     setStartingApp(false);
 
-    const isSuccess = await stopApp();
+    await stopLowcodeApp(appPort);
 
-    if (isSuccess) {
-      handleToggleAppRunStatus(false);
-    }
+    // const isSuccess = await stopApp();
+
+    // if (isSuccess) {
+    //   handleToggleAppRunStatus(false);
+    // }
   };
 
   const ACTION_MAP_INVOKE: Record<
@@ -414,7 +416,7 @@ export const PageAppDetail = () => {
                 {
                   appUrls.map((openUrl, index) => (
                     <>
-                      <div onClick={handleOpenUrl(openUrl)} className="flex items-center text-xs cursor-pointer hover:text-[var(--theme-primary)]">
+                      <div key={openUrl} onClick={handleOpenUrl(openUrl)} className="flex items-center text-xs cursor-pointer hover:text-[var(--theme-primary)]">
                         {openUrl}
                         <GlobalOutlined className="ml-1" />
                       </div>

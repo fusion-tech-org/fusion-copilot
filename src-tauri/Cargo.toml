@@ -60,6 +60,7 @@ async-trait = "0.1.73" # allowing include `async fn` in trait
 # sqlparser = "0.37.0" # SQL parser
 sqlparser = "0.10.0"                                       # SQL parser
 polars = { version = "0.15", features = ["json", "lazy"] } # DataFrame library
+local-ip-address = "0.5.6"
 
 
 [features]

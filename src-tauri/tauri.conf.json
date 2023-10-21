@@ -35,6 +35,11 @@
             "args": true
           },
           {
+            "name": "run-bat-file",
+            "cmd": "cmd",
+            "args": true
+          },
+          {
             "name": "run-kill-app",
             "cmd": "kill",
             "args": true

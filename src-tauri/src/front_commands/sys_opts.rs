@@ -1,3 +1,4 @@
+use local_ip_address::local_ip;
 use std::ops::Range;
 use std::str::FromStr;
 use std::{net::TcpListener, thread};
@@ -58,5 +59,15 @@ pub fn check_port_is_available(port: u16) -> bool {
   match TcpListener::bind(("127.0.0.1", port)) {
     Ok(_) => true,
     Err(_) => false,
+  }
+}
+
+#[tauri::command]
+pub fn query_local_ip() -> String {
+  let local_ip_addr = local_ip().map_err(|_| "Can not get local ip address".to_string());
+
+  match local_ip_addr {
+    Ok(v) => v.to_string(),
+    Err(_) => "".to_string(),
   }
 }

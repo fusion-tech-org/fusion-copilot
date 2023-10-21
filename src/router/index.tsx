@@ -4,6 +4,8 @@ import { HomePage } from 'pages/Home';
 import { DeveloperPage } from 'pages/Developer';
 import { PageAppDetail } from 'pages/Developer/PageAppDetail';
 import { PageDataJson } from 'pages/Developer/PageDataJson';
+import { PageAppLog } from 'pages/Developer/PageAppLog/index';
+import { PageEditScript } from 'pages/Developer/PageEditScript/index';
 import { PageDevSetting } from 'pages/Developer/PageDevSetting/index';
 import {
   ToolKitPage,
@@ -58,6 +60,14 @@ export const rootRouter = createBrowserRouter([
   {
     path: '/developer/app/data-json/:aid',
     element: <PageDataJson />,
+  },
+  {
+    path: '/developer/app/log/:aid',
+    element: <PageAppLog />,
+  },
+  {
+    path: '/developer/app/script/:aid',
+    element: <PageEditScript />,
   },
   {
     path: '/developer/app/:id',

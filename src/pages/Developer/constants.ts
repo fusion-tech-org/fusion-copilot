@@ -9,18 +9,18 @@ export const ActionList: Readonly<
     id: number;
   }>
 > = [
-    {
-      id: 1,
-      label: '解压',
-      value: 'unzip',
-      actionStatus: 'primary',
-    },
-    {
-      id: 2,
-      label: '启动',
-      value: 'startup',
-      actionStatus: 'primary',
-    },
+    // {
+    //   id: 1,
+    //   label: '解压',
+    //   value: 'unzip',
+    //   actionStatus: 'primary',
+    // },
+    // {
+    //   id: 2,
+    //   label: '启动',
+    //   value: 'startup',
+    //   actionStatus: 'primary',
+    // },
     {
       id: 3,
       label: '停止',
@@ -34,3 +34,13 @@ export const ActionList: Readonly<
       actionStatus: 'default'
     },
   ];
+
+export const OPEN_IP_LIST = [
+  'http://localhost',
+  "http://127.0.0.1",
+];
+
+export const DEFAULT_APP_PORT = 9080;
+
+
+export const APP_ENV_CONFIG = ['test', 'dev'];

@@ -10,7 +10,7 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="flex flex-col mt-8 items-center h-screen">
+    <div className="flex flex-col pt-8 items-center h-screen">
       <Icon iconName='logo' svgStyle={{
         width: 72,
         height: 72

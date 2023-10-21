@@ -1,20 +1,45 @@
 import { resolveResource } from "@tauri-apps/api/path";
 import { Command } from "@tauri-apps/api/shell";
 import { get } from "lodash";
+import { platform, Platform } from '@tauri-apps/api/os';
+
+
+
+export const isSpecialPlatform = async (platformName: Platform) => {
+  const curPlatform = await platform();
+
+  return platformName === curPlatform;
+};
+
+export const isWin32 = async () => await isSpecialPlatform('win32');
+
+export const isMac = async () => await isSpecialPlatform('darwin');
+
+export const isLinux = async () => await isSpecialPlatform('linux');
 
 export const stopApp = async (port?: number) => {
   try {
-    const resourcePath = await resolveResource('scripts/query_app_pid.sh');
-    const execRes = await new Command('run-sh-file', resourcePath).execute();
-    console.log(port);
-    if (execRes.code === 0 && execRes.stdout) {
-      const killProcess = await new Command(
-        'run-kill-app',
-        execRes.stdout
-      ).execute();
+    const isWinSys = await isWin32();
+    const queryPidPath = isWinSys ? await resolveResource('scripts/first_batch.bat') : await resolveResource('scripts/query_app_pid.sh');
 
-      return killProcess.code === 0;
+    let execRes: Record<string, any> = {};
+
+    if (isWinSys) {
+      execRes = await new Command('run-bat-file', queryPidPath).execute();
+    } else {
+      execRes = await new Command('run-sh-file', queryPidPath).execute();
     }
+
+    console.log(port);
+    console.log(execRes);
+    // if (execRes.code === 0 && execRes.stdout) {
+    //   const killProcess = await new Command(
+    //     'run-kill-app',
+    //     execRes.stdout
+    //   ).execute();
+
+    //   return killProcess.code === 0;
+    // }
 
     return false;
   } catch (e) {

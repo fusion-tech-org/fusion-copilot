@@ -64,6 +64,14 @@ export const SettingContainer = styled.div`
   padding: 16px 24px;
 `;
 
+export const AppLogContainer = styled.div`
+  padding: 16px 24px;
+`;
+
+export const AppScriptContainer = styled.div`
+  padding: 16px 24px;
+`;
+
 export const EnvSettingContainer = styled.div`
   .ant-collapse-header:hover {
     .show-edit {

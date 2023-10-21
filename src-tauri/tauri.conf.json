@@ -8,11 +8,14 @@
   },
   "package": {
     "productName": "FusionCopilot",
-    "version": "0.1.8"
+    "version": "0.1.9"
   },
   "tauri": {
     "allowlist": {
       "all": false,
+      "os": {
+        "all": true
+      },
       "shell": {
         "all": false,
         "execute": true,
@@ -35,6 +38,11 @@
             "args": true
           },
           {
+            "name": "run-ps",
+            "cmd": "powershell",
+            "args": true
+          },
+          {
             "name": "run-kill-app",
             "cmd": "kill",
             "args": true
@@ -45,15 +53,14 @@
             "args": true
           },
           {
-            "name": "run-git-commit",
+            "name": "run-git",
             "cmd": "git",
-            "args": [
-              "commit",
-              "-m",
-              {
-                "validator": "\\S+"
-              }
-            ]
+            "args": true
+          },
+          {
+            "name": "run-netstat",
+            "cmd": "netstat",
+            "args": true
           }
         ]
       },

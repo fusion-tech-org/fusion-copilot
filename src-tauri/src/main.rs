@@ -12,7 +12,8 @@ use front_commands::{
   config_opts::{create_env_config, query_env_configs},
   file_opts::{get_resource_file, greet, unzip_file},
   sys_opts::{
-    check_port_is_available, close_splashscreen, get_available_port_list, run_local_server,
+    check_port_is_available, close_splashscreen, get_available_port_list,
+    get_process_by_port_for_unix, get_process_by_port_for_win, query_local_ip, run_local_server,
   },
 };
 
@@ -82,7 +83,10 @@ fn main() {
       get_app_by_id,
       del_app_by_id,
       query_env_configs,
-      create_env_config
+      create_env_config,
+      query_local_ip,
+      get_process_by_port_for_unix,
+      get_process_by_port_for_win
     ])
     .system_tray(custom_tray)
     .on_system_tray_event(|app, event| handle_sys_tray_event(app, event))
